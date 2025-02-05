@@ -1,4 +1,4 @@
-import { baseInfoAtom, repoInfoAton } from "@/store/repo"
+import { baseInfoAtom, repoInfoAtom } from "@/store/repo"
 import { useAtom, useAtomValue } from "jotai"
 import {
   Avatar,
@@ -25,7 +25,7 @@ enum ActionKey {
 }
 
 export function Header() {
-  const repoInfo = useAtomValue(repoInfoAton)
+  const repoInfo = useAtomValue(repoInfoAtom)
   const { owner, repo } = useAtomValue(baseInfoAtom)
   const [leftPanelOpen, setLeftPanelOpen] = useAtom(leftPanelOpenAtom)
   const [bottomPanelOpen, setBottomPanelOpen] = useAtom(bottomPanelOpenAtom)
@@ -51,7 +51,7 @@ export function Header() {
           repoInfo?.ownerInfo?.name ?
             <Avatar className="w-6 h-6">
               <AvatarImage src={repoInfo.ownerInfo.avatar} alt={repoInfo.ownerInfo.name} />
-              <AvatarFallback>{repoInfo.ownerInfo.name.slice(0, 2)}</AvatarFallback>
+              <AvatarFallback className="bg-slate-500">{repoInfo.ownerInfo.name.slice(0, 2)}</AvatarFallback>
             </Avatar> :
             <Skeleton className="w-6 h-6 bg-slate-500 rounded-full" />
         }

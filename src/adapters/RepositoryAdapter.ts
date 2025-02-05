@@ -1,3 +1,5 @@
+import {FileSystemTree} from "@webcontainer/api";
+
 export interface RepositoryAdapter {
   fetchRepository(owner: string, repo: string, path?: string): Promise<{
     files: Array<{
@@ -5,6 +7,7 @@ export interface RepositoryAdapter {
       content: string;
       type: 'file' | 'directory';
     }>;
+    fileSystem: FileSystemTree;
   }>;
 
   /**

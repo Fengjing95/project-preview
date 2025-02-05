@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
-import { GitHubAdapter } from '@/adapters/GitHubAdapter';
 import { WebContainerService } from '@/services/WebContainerService';
-import { Terminal } from '@/components/Terminal/index';
+import { Terminal } from '@/components/Terminal';
 import { Preview } from '@/components/Preview';
 import { Editor } from '@/components/Editor';
 import { FileTree } from '@/components/FileTree';
@@ -15,8 +14,8 @@ import {
   ResizablePanelGroup
 } from "@/components/ui/resizable"
 import { Header } from '@/components/Header';
-import { useAtomValue, useSetAtom } from 'jotai';
-import { baseInfoAtom, repositoryAtom } from '@/store/repo';
+import { useAtomValue} from 'jotai';
+import { baseInfoAtom } from '@/store/repo';
 import { bottomPanelOpenAtom, leftPanelOpenAtom, resolveLeftPanelAtom } from '@/store/global';
 import { useResize } from '@/hooks/useResize';
 import {
@@ -37,8 +36,7 @@ function App() {
   const resolveLeftPanel = useAtomValue(resolveLeftPanelAtom); // 左侧面板的宽度
   const leftPanelOpen = useAtomValue(leftPanelOpenAtom)
   const bottomPanelOpen = useAtomValue(bottomPanelOpenAtom)
-  const setRepo = useSetAtom(repositoryAtom);
-  const { owner, repo, branch } = useAtomValue(baseInfoAtom);
+  const { owner, repo, branch, repository } = useAtomValue(baseInfoAtom);
   const {
     globalPanelGroupRef,
     leftPanelResize,
@@ -46,14 +44,14 @@ function App() {
     bottomPanelResize
   } = useResize();
 
-  const handlePreview = async (owner: string, repo: string, branch?: string) => {
+  const handlePreview = async () => {
+    if (!owner || !repo || !repository) {
+      return
+    }
+
     try {
-      // 初始化适配器
-      // TODO token
-      const githubAdapter = new GitHubAdapter('');
-      setRepo(githubAdapter)
       // 获取仓库文件系统
-      const { fileSystem } = await githubAdapter.fetchRepository(owner, repo, branch);
+      const { fileSystem } = await repository.fetchRepository(owner, repo, branch);
       setStatus(ServiceStatus.PULLING);
 
       // 初始化 WebContainer 服务
@@ -103,10 +101,8 @@ function App() {
   };
 
   useEffect(() => {
-    if (owner && repo) {
-      handlePreview(owner, repo, branch);
-    }
-  }, [owner, repo, branch]);
+      handlePreview();
+  }, []);
 
   return (
     <div className="w-full h-[100vh] bg-slate-700 px-4 pb-4 flex flex-col">
