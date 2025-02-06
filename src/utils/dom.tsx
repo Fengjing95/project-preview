@@ -58,3 +58,15 @@ export async function initMonaco() {
     },
   })
 }
+
+/**
+ * 获取css 主题变量值
+ * @param variableName css变量名称
+ * @returns 
+ */
+export const getThemeColor = (variableName: string) => {
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(variableName)
+    .trim();
+  return `hsl(${value})`;
+};

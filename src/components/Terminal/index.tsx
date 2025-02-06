@@ -3,7 +3,6 @@ import { Terminal as XTerm } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
 import { bindEvent, EventName, removeEvent } from '@/utils/evenemitter';
-import { getPropByClass } from '@/utils/dom';
 import { useThrottleFn } from 'ahooks';
 import { activeTerminalAtom, removeTerminalAtom, TerminalModel, terminalsAtom } from '@/store/terminal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -11,6 +10,7 @@ import { BiTerminal, BiTrash } from 'react-icons/bi';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import clsx from 'clsx';
 import { useTheme } from '../ThemeProvider';
+import { XTERM_THEME } from '@/constants/xtermTheme';
 
 interface IProps {
   instance: TerminalModel;
@@ -30,10 +30,9 @@ export function Terminal({ instance }: IProps) {
   useEffect(() => {
     if (!terminalEleRef.current) return;
 
-    const background = getPropByClass('bg-slate-900', 'backgroundColor') as string
     const terminal = new XTerm({
       theme: {
-        background: '#fff',
+        ...XTERM_THEME[theme]
       },
     }); // 初始化terminal
     terminalRef.current = terminal
@@ -77,9 +76,10 @@ export function Terminal({ instance }: IProps) {
 
   useEffect(() => {
     if (!terminalRef.current) return
-    terminalRef.current.options.theme!.background = theme === 'dark' ? '#000' : '#fff'
-    terminalRef.current.refresh(0, terminalRef.current.rows - 1)
-    console.log("🚀 ~ useEffect ~ terminalRef:", terminalRef.current.options)
+
+    terminalRef.current.options.theme = {
+      ...XTERM_THEME[theme]
+    }
   }, [theme])
 
   return <div className="w-full h-full" ref={terminalEleRef} />;
