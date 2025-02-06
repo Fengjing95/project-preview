@@ -4,6 +4,7 @@ import { WebContainerService } from '../../services/WebContainerService';
 import { getFileLang } from '@/utils/getFileLang';
 import { useKeyPress } from 'ahooks';
 import { KEY_MAP } from '@/constants/keyboard';
+import { useTheme } from '../ThemeProvider';
 
 interface EditorProps {
   filePath: string;
@@ -18,6 +19,7 @@ export const Editor: React.FC<EditorProps> = ({
   onChange
 }) => {
   const editorRef = useRef<Parameters<OnMount>[0] | null>(null);
+  const { theme } = useTheme()
 
   useEffect(() => {
     const container = WebContainerService.getInstance();
@@ -38,6 +40,13 @@ export const Editor: React.FC<EditorProps> = ({
 
     loadFileContent();
   }, [filePath]);
+
+  // 全局主题变化时更新编辑器主题
+  useEffect(() => {
+    editorRef.current?.updateOptions({
+      theme
+    })
+  }, [theme])
 
   const handleEditorChange = () => {
     const value = editorRef.current?.getValue() || ''
@@ -64,7 +73,7 @@ export const Editor: React.FC<EditorProps> = ({
   return (
     <div style={{ width: '100%', height: '100%' }}>
       <MonacoEditor
-        theme="customTheme"
+        theme={theme}
         height="100%"
         defaultValue={defaultValue}
         language={getFileLang(filePath)}

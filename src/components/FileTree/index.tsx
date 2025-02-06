@@ -3,7 +3,6 @@ import { WebContainerService } from '../../services/WebContainerService';
 import { bindEvent, EventName, removeEvent } from '@/utils/evenemitter';
 import { BiFolder, BiFolderOpen } from 'react-icons/bi';
 import { getFileIcon } from '@/utils/getFileLang';
-import './index.css'
 
 interface FileTreeProps {
   onSelect?: (filePath: string) => void;
@@ -127,7 +126,7 @@ export const FileTree: React.FC<FileTreeProps> = ({ onSelect }) => {
     return (
       <div key={node.path} className="text-sm">
         <div
-          className='p-1 flex items-center cursor-pointer rounded hover:bg-slate-800'
+          className='p-1 pl-2 flex items-center cursor-pointer rounded'
           onClick={() => {
             if (node.type === 'directory') {
               toggleDirectory(node.path);
@@ -159,7 +158,7 @@ export const FileTree: React.FC<FileTreeProps> = ({ onSelect }) => {
   };
 
   return <div
-    className='w-full h-full text-white select-none overflow-auto file-tree'
+    className='w-full h-full select-none overflow-auto'
   >
     {files.map(renderNode)}
   </div>;

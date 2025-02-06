@@ -35,7 +35,7 @@ export const splitAndRenderCode = (text: string, separator: string = ',') => {
   return parts.map((part, index) => (
     <code
       key={index}
-      className="inline-block px-1 py-1/2 mx-1 bg-gray-100 rounded font-mono text-sm"
+      className="inline-block px-1 py-1/2 mx-1 bg-secondary-foreground rounded font-mono text-sm"
     >
       {part.trim()}
     </code>
@@ -49,7 +49,7 @@ export async function initMonaco() {
   const monaco = await loader.init()
 
   const background = rgbToHex(getPropByClass('bg-slate-900', 'backgroundColor') as string)
-  monaco.editor.defineTheme('customTheme', {
+  monaco.editor.defineTheme('dark', {
     base: "vs-dark",
     inherit: true,
     rules: [],

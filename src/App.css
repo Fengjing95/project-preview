@@ -1,35 +1,15 @@
-.container {}
-
-.file-tree-container {
-  width: 240px;
-  border: 1px solid #333;
-  border-radius: 4px;
-  overflow: hidden;
+::-webkit-scrollbar {
+  @apply w-2;
 }
 
-.editor-container {
-  border: 1px solid #333;
-  border-radius: 4px;
-  overflow: hidden;
-  height: 200px;
+::-webkit-scrollbar-track {
+  @apply bg-transparent;
 }
 
-.terminal-container {
-  height: 400px;
-  border: 1px solid #333;
-  border-radius: 4px;
-  overflow: hidden;
+.dark ::-webkit-scrollbar-thumb {
+  @apply bg-slate-600 rounded-full hover:bg-slate-500;
 }
 
-.preview-container {
-  height: 300px;
-  border: 1px solid #333;
-  border-radius: 4px;
-  overflow: hidden;
-}
-
-
-.error {
-  color: #ff4444;
-  margin-top: 1rem;
+.light ::-webkit-scrollbar-thumb {
+  @apply bg-gray-300 rounded-full hover:bg-gray-200;
 }
