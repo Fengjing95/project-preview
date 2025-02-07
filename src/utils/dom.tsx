@@ -48,7 +48,7 @@ export const splitAndRenderCode = (text: string, separator: string = ',') => {
 export async function initMonaco() {
   const monaco = await loader.init()
 
-  const background = rgbToHex(getPropByClass('bg-slate-900', 'backgroundColor') as string)
+  const background = rgbToHex(getPropByClass('bg-background', 'backgroundColor') as string)
   monaco.editor.defineTheme('dark', {
     base: "vs-dark",
     inherit: true,

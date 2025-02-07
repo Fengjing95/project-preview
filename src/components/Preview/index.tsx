@@ -6,7 +6,7 @@ interface PreviewProps {
 
 export const Preview = forwardRef<HTMLIFrameElement, PreviewProps>((_, ref) => {
   return (
-    <div className="h-full w-full bg-white">
+    <div className="h-full w-full">
       <iframe
         ref={ref}
         className="h-full w-full"

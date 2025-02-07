@@ -11,6 +11,7 @@ import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import clsx from 'clsx';
 import { useTheme } from '../ThemeProvider';
 import { XTERM_THEME } from '@/constants/xtermTheme';
+import { getPropByClass } from '@/utils/dom';
 
 interface IProps {
   instance: TerminalModel;
@@ -32,7 +33,8 @@ export function Terminal({ instance }: IProps) {
 
     const terminal = new XTerm({
       theme: {
-        ...XTERM_THEME[theme]
+        ...XTERM_THEME[theme],
+        background: getPropByClass('bg-background', 'backgroundColor') as string
       },
     }); // 初始化terminal
     terminalRef.current = terminal
@@ -78,7 +80,8 @@ export function Terminal({ instance }: IProps) {
     if (!terminalRef.current) return
 
     terminalRef.current.options.theme = {
-      ...XTERM_THEME[theme]
+      ...XTERM_THEME[theme],
+      background: getPropByClass('bg-background', 'backgroundColor') as string
     }
   }, [theme])
 

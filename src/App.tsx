@@ -125,7 +125,7 @@ function App() {
             <FileTree onSelect={setCurrentFile} />
           </div>
         </ResizablePanel>
-        <ResizableHandle className="bg-primary" />
+        <ResizableHandle />
         {/* mainPanel */}
         <ResizablePanel defaultSize={100 - resolveLeftPanel}>
           <ResizablePanelGroup direction="vertical" ref={mainPanelGroupRef}>
