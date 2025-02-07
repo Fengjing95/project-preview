@@ -17,6 +17,7 @@ import { Toggle } from "@/components/ui/toggle"
 import { leftPanelOpenAtom, bottomPanelOpenAtom } from "@/store/global";
 import { useKeyPress } from "ahooks"
 import { KEY_MAP } from "@/constants/keyboard"
+import { ThemeToggle } from "../ThemeProvider/ThemeToggle"
 
 enum ActionKey {
   LEFT_PANEL = 'leftPanel',
@@ -38,9 +39,9 @@ export function Header() {
     setBottomPanelOpen(!bottomPanelOpen)
   })
 
-  return <div className="h-full flex items-center select-none">
+  return <div className="h-full flex items-center select-none px-4 border-b">
     {/* owner信息 */}
-    <div className="flex-1 flex gap-2 ">
+    <div className="flex-1 flex gap-2 items-center">
       <a
         className="cursor-pointer flex gap-2"
         href={repoInfo?.ownerInfo?.htmlUrl}
@@ -51,24 +52,23 @@ export function Header() {
           repoInfo?.ownerInfo?.name ?
             <Avatar className="w-6 h-6">
               <AvatarImage src={repoInfo.ownerInfo.avatar} alt={repoInfo.ownerInfo.name} />
-              <AvatarFallback className="bg-slate-500">{repoInfo.ownerInfo.name.slice(0, 2)}</AvatarFallback>
+              <AvatarFallback>{repoInfo.ownerInfo.name.slice(0, 2)}</AvatarFallback>
             </Avatar> :
-            <Skeleton className="w-6 h-6 bg-slate-500 rounded-full" />
+            <Skeleton className="w-6 h-6 rounded-full border" />
         }
 
         {
           repoInfo?.ownerInfo?.name ?
-            <span className="text-white">{repoInfo?.ownerInfo.name}</span> :
-            <Skeleton className="w-24 h-6 bg-slate-500" />
+            <span className="text-secondary-foreground">{repoInfo?.ownerInfo.name}</span> :
+            <Skeleton className="w-24 h-6" />
         }
       </a>
       <BiSolidWindowAlt
-        className="w-6 h-6 text-slate-300 cursor-pointer"
+        className="cursor-pointer"
         title="复制 iframe 嵌入代码"
         onClick={() => { }}
       />
     </div>
-
 
     {/* 仓库名称 */}
     <div className="flex-1 flex justify-center">
@@ -80,8 +80,6 @@ export function Header() {
           'block',
           'rounded-lg',
           'border',
-          'border-slate-500',
-          'text-slate-300',
           'cursor-pointer',
           'px-5',
           'text-center',
@@ -99,7 +97,7 @@ export function Header() {
 
     {/* actions */}
     <div
-      className="flex-1 flex justify-end text-slate-300 gap-2"
+      className="flex-1 flex justify-end gap-1"
     >
       <Toggle
         value={ActionKey.LEFT_PANEL}
@@ -107,8 +105,8 @@ export function Header() {
         title="左侧面板"
         size="sm"
         className={clsx(
-          '[&_svg]:size-6 hover:bg-slate-600',
-          { 'bg-slate-600': leftPanelOpen }
+          // '[&_svg]:size-6',
+          // { 'bg-slate-600': leftPanelOpen }
         )}
         onClick={() => {
           setLeftPanelOpen(!leftPanelOpen)
@@ -122,8 +120,8 @@ export function Header() {
         title="底部面板"
         size="sm"
         className={clsx(
-          '[&_svg]:size-6 hover:bg-slate-600',
-          { 'bg-slate-600': bottomPanelOpen }
+          // '[&_svg]:size-6',
+          // { 'bg-slate-600': bottomPanelOpen }
         )}
         onClick={() => {
           setBottomPanelOpen(!bottomPanelOpen)
@@ -136,11 +134,10 @@ export function Header() {
         aria-label="预览"
         title="预览"
         size="sm"
-        className="[&_svg]:size-6 hover:bg-slate-600"
-        onChange={console.log}
       >
         <BiDesktop />
       </Toggle>
+      <ThemeToggle />
     </div>
   </div >
 }

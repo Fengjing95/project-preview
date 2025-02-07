@@ -14,9 +14,9 @@ import {
   ResizablePanelGroup
 } from "@/components/ui/resizable"
 import { Header } from '@/components/Header';
-import { useAtomValue} from 'jotai';
+import { useAtomValue } from 'jotai';
 import { baseInfoAtom } from '@/store/repo';
-import { bottomPanelOpenAtom, leftPanelOpenAtom, resolveLeftPanelAtom } from '@/store/global';
+import { resolveLeftPanelAtom } from '@/store/global';
 import { useResize } from '@/hooks/useResize';
 import {
   Tabs,
@@ -27,15 +27,13 @@ import {
 import { BiPlus } from 'react-icons/bi';
 import { Welcome } from '@/components/Welcome';
 import { initMonaco } from '@/utils/dom';
-import clsx from 'clsx';
+import './App.css';
 
 function App() {
   const [status, setStatus] = useState(ServiceStatus.INIT);
   const [currentFile, setCurrentFile] = useState('');
   const previewRef = useRef<HTMLIFrameElement>(null);
   const resolveLeftPanel = useAtomValue(resolveLeftPanelAtom); // 左侧面板的宽度
-  const leftPanelOpen = useAtomValue(leftPanelOpenAtom)
-  const bottomPanelOpen = useAtomValue(bottomPanelOpenAtom)
   const { owner, repo, branch, repository } = useAtomValue(baseInfoAtom);
   const {
     globalPanelGroupRef,
@@ -101,11 +99,11 @@ function App() {
   };
 
   useEffect(() => {
-      handlePreview();
+    handlePreview();
   }, []);
 
   return (
-    <div className="w-full h-[100vh] bg-slate-700 px-4 pb-4 flex flex-col">
+    <div className="w-full h-[100vh] flex flex-col rounded-2xl border overflow-hidden">
       {/* headerPanel */}
       <div className="h-10">
         <Header />
@@ -118,21 +116,20 @@ function App() {
         {/* leftPanel */}
         <ResizablePanel
           defaultSize={resolveLeftPanel}
-          className="rounded-2xl"
           maxSize={70}
           onResize={leftPanelResize}
           minSize={10}
           collapsible
         >
-          <div className="flex h-full items-center justify-center p-2 rounded bg-slate-900">
+          <div className="flex h-full items-center justify-center p-2">
             <FileTree onSelect={setCurrentFile} />
           </div>
         </ResizablePanel>
-        <ResizableHandle className={clsx({ "mx-1": leftPanelOpen })} />
+        <ResizableHandle />
         {/* mainPanel */}
         <ResizablePanel defaultSize={100 - resolveLeftPanel}>
           <ResizablePanelGroup direction="vertical" ref={mainPanelGroupRef}>
-            <ResizablePanel defaultSize={75} className="rounded-2xl">
+            <ResizablePanel defaultSize={75}>
               <ResizablePanelGroup direction="horizontal">
                 {/* editor */}
                 <ResizablePanel defaultSize={50}>
@@ -151,25 +148,23 @@ function App() {
                 </ResizablePanel>
               </ResizablePanelGroup>
             </ResizablePanel>
-            <ResizableHandle className={clsx({ "my-1": bottomPanelOpen })} />
+            <ResizableHandle />
             {/* bottomPanel */}
             <ResizablePanel
               defaultSize={25}
               onResize={bottomPanelResize}
               collapsible
               minSize={5}
-              className="rounded-2xl"
             >
-              <div className="bg-slate-900 w-full h-full items-center justify-center">
+              <div className="w-full h-full items-center justify-center">
                 <Tabs defaultValue="terminal" className="h-full">
-                  <div className="flex justify-between pt-2 pr-4 text-white">
+                  <div className="flex justify-between pt-2 pr-4">
                     <TabsList className="h-6 text-xs">
-                      {/* data-[state=active]:bg-slate-600 */}
-                      <TabsTrigger className="hover:bg-slate-700" value="terminal">终端</TabsTrigger>
+                      <TabsTrigger value="terminal">终端</TabsTrigger>
                     </TabsList>
                     <TabsContent value="terminal" className="m-0">
                       <BiPlus
-                        className="cursor-pointer hover:bg-slate-700 h-6 w-6 rounded-md"
+                        className="cursor-pointer h-6 w-6 rounded-md"
                         onClick={() => {
                           const service = WebContainerService.getInstance()
                           service.newTerminal()

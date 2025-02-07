@@ -35,7 +35,7 @@ export const splitAndRenderCode = (text: string, separator: string = ',') => {
   return parts.map((part, index) => (
     <code
       key={index}
-      className="inline-block px-1 py-1/2 mx-1 bg-gray-100 rounded font-mono text-sm"
+      className="inline-block px-1 py-1/2 mx-1 bg-secondary-foreground rounded font-mono text-sm"
     >
       {part.trim()}
     </code>
@@ -48,8 +48,8 @@ export const splitAndRenderCode = (text: string, separator: string = ',') => {
 export async function initMonaco() {
   const monaco = await loader.init()
 
-  const background = rgbToHex(getPropByClass('bg-slate-900', 'backgroundColor') as string)
-  monaco.editor.defineTheme('customTheme', {
+  const background = rgbToHex(getPropByClass('bg-background', 'backgroundColor') as string)
+  monaco.editor.defineTheme('dark', {
     base: "vs-dark",
     inherit: true,
     rules: [],
@@ -58,3 +58,15 @@ export async function initMonaco() {
     },
   })
 }
+
+/**
+ * 获取css 主题变量值
+ * @param variableName css变量名称
+ * @returns 
+ */
+export const getThemeColor = (variableName: string) => {
+  const value = getComputedStyle(document.documentElement)
+    .getPropertyValue(variableName)
+    .trim();
+  return `hsl(${value})`;
+};

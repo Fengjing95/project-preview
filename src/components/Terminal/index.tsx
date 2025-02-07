@@ -3,14 +3,15 @@ import { Terminal as XTerm } from '@xterm/xterm';
 import { FitAddon } from '@xterm/addon-fit';
 import '@xterm/xterm/css/xterm.css';
 import { bindEvent, EventName, removeEvent } from '@/utils/evenemitter';
-import { getPropByClass } from '@/utils/dom';
 import { useThrottleFn } from 'ahooks';
-import './index.css'
 import { activeTerminalAtom, removeTerminalAtom, TerminalModel, terminalsAtom } from '@/store/terminal';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { BiTerminal, BiTrash } from 'react-icons/bi';
 import { useAtom, useAtomValue, useSetAtom } from 'jotai';
 import clsx from 'clsx';
+import { useTheme } from '../ThemeProvider';
+import { XTERM_THEME } from '@/constants/xtermTheme';
+import { getPropByClass } from '@/utils/dom';
 
 interface IProps {
   instance: TerminalModel;
@@ -19,6 +20,8 @@ interface IProps {
 export function Terminal({ instance }: IProps) {
   const terminalEleRef = useRef<HTMLDivElement>(null);
   const fitRef = useRef<FitAddon>()
+  const terminalRef = useRef<XTerm>()
+  const { theme } = useTheme()
   const { run: resize } = useThrottleFn(() => {
     fitRef.current?.fit()
   }, {
@@ -28,12 +31,13 @@ export function Terminal({ instance }: IProps) {
   useEffect(() => {
     if (!terminalEleRef.current) return;
 
-    const background = getPropByClass('bg-slate-900', 'backgroundColor') as string
     const terminal = new XTerm({
       theme: {
-        background: background,
+        ...XTERM_THEME[theme],
+        background: getPropByClass('bg-background', 'backgroundColor') as string
       },
     }); // 初始化terminal
+    terminalRef.current = terminal
 
     const fitAddon = new FitAddon(); // size 调整插件
     fitRef.current = fitAddon
@@ -72,6 +76,15 @@ export function Terminal({ instance }: IProps) {
     };
   }, [instance]);
 
+  useEffect(() => {
+    if (!terminalRef.current) return
+
+    terminalRef.current.options.theme = {
+      ...XTERM_THEME[theme],
+      background: getPropByClass('bg-background', 'backgroundColor') as string
+    }
+  }, [theme])
+
   return <div className="w-full h-full" ref={terminalEleRef} />;
 };
 
@@ -109,9 +122,7 @@ Terminal.Multiple = function Multiple() {
             'items-start',
             'justify-start',
             'h-full',
-            'border-l-slate-700',
             'border-l-[1px]',
-            'border-solid',
             'rounded-none',
             'overflow-y-auto',
             'w-36',
@@ -122,10 +133,7 @@ Terminal.Multiple = function Multiple() {
               key={item.id}
               value={item.id}
               className={clsx([
-                'hover:bg-slate-700',
-                'text-slate-300',
                 'w-full',
-                'data-[state=active]:bg-slate-600',
                 'text-center',
                 'justify-start',
                 'group',
