@@ -3,5 +3,5 @@
  * @param text 文本
  */
 export async function copyToClipboard(text: string) {
-    return navigator.clipboard.writeText(text);
+  return navigator.clipboard.writeText(text)
 }

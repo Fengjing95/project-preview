@@ -21,7 +21,7 @@ const lightTheme: ITheme = {
   brightBlue: '#3498db',
   brightMagenta: '#9b59b6',
   brightCyan: '#1abc9c',
-  brightWhite: '#ffffff'
+  brightWhite: '#ffffff',
 }
 
 // 暗色主题配置
@@ -45,10 +45,10 @@ const darkTheme: ITheme = {
   brightBlue: '#d6acff',
   brightMagenta: '#ff92df',
   brightCyan: '#a4ffff',
-  brightWhite: '#ffffff'
+  brightWhite: '#ffffff',
 }
 
 export const XTERM_THEME = {
   light: lightTheme,
-  dark: darkTheme
+  dark: darkTheme,
 }

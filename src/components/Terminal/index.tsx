@@ -1,55 +1,63 @@
-import { useEffect, useRef } from 'react';
-import { Terminal as XTerm } from '@xterm/xterm';
-import { FitAddon } from '@xterm/addon-fit';
-import '@xterm/xterm/css/xterm.css';
-import { bindEvent, EventName, removeEvent } from '@/utils/evenemitter';
-import { useThrottleFn } from 'ahooks';
-import { activeTerminalAtom, removeTerminalAtom, TerminalModel, terminalsAtom } from '@/store/terminal';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { BiTerminal, BiTrash } from 'react-icons/bi';
-import { useAtom, useAtomValue, useSetAtom } from 'jotai';
-import clsx from 'clsx';
-import { useTheme } from '../ThemeProvider';
-import { XTERM_THEME } from '@/constants/xtermTheme';
-import { getPropByClass } from '@/utils/dom';
+import { useEffect, useRef } from 'react'
+import { Terminal as XTerm } from '@xterm/xterm'
+import { FitAddon } from '@xterm/addon-fit'
+import '@xterm/xterm/css/xterm.css'
+import { bindEvent, EventName, removeEvent } from '@/utils/evenemitter'
+import { useThrottleFn } from 'ahooks'
+import {
+  activeTerminalAtom,
+  removeTerminalAtom,
+  TerminalModel,
+  terminalsAtom,
+} from '@/store/terminal'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { BiTerminal, BiTrash } from 'react-icons/bi'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import clsx from 'clsx'
+import { useTheme } from '../ThemeProvider'
+import { XTERM_THEME } from '@/constants/xtermTheme'
+import { getPropByClass } from '@/utils/dom'
 
 interface IProps {
-  instance: TerminalModel;
+  instance: TerminalModel
 }
 
 export function Terminal({ instance }: IProps) {
-  const terminalEleRef = useRef<HTMLDivElement>(null);
+  const terminalEleRef = useRef<HTMLDivElement>(null)
   const fitRef = useRef<FitAddon>()
   const terminalRef = useRef<XTerm>()
   const { theme } = useTheme()
-  const { run: resize } = useThrottleFn(() => {
-    fitRef.current?.fit()
-  }, {
-    wait: 100
-  })
+  const { run: resize } = useThrottleFn(
+    () => {
+      fitRef.current?.fit()
+    },
+    {
+      wait: 100,
+    },
+  )
 
   useEffect(() => {
-    if (!terminalEleRef.current) return;
+    if (!terminalEleRef.current) return
 
     const terminal = new XTerm({
       theme: {
         ...XTERM_THEME[theme],
-        background: getPropByClass('bg-background', 'backgroundColor') as string
+        background: getPropByClass('bg-background', 'backgroundColor') as string,
       },
-    }); // 初始化terminal
+    }) // 初始化terminal
     terminalRef.current = terminal
 
-    const fitAddon = new FitAddon(); // size 调整插件
+    const fitAddon = new FitAddon() // size 调整插件
     fitRef.current = fitAddon
-    terminal.loadAddon(fitAddon);
+    terminal.loadAddon(fitAddon)
 
-    terminal.open(terminalEleRef.current); // 挂载元素
+    terminal.open(terminalEleRef.current) // 挂载元素
     // fitAddon.fit();
 
     // 输出事件
     const outputFunc = (id: unknown, data: unknown) => {
       if (id === instance.id) {
-        terminal.write(data as string);
+        terminal.write(data as string)
       }
     }
 
@@ -65,28 +73,27 @@ export function Terminal({ instance }: IProps) {
     bindEvent(EventName.CONTAINER_OUTPUT, outputFunc)
 
     // 监听resize事件
-    const resizeObserver = new ResizeObserver(resize);
+    const resizeObserver = new ResizeObserver(resize)
     resizeObserver.observe(terminalEleRef.current)
 
     return () => {
-      terminal.dispose();
+      terminal.dispose()
       removeEvent(EventName.CONTAINER_OUTPUT, outputFunc)
-      if (terminalEleRef.current)
-        resizeObserver.unobserve(terminalEleRef.current as HTMLDivElement)
-    };
-  }, [instance]);
+      if (terminalEleRef.current) resizeObserver.unobserve(terminalEleRef.current as HTMLDivElement)
+    }
+  }, [instance])
 
   useEffect(() => {
     if (!terminalRef.current) return
 
     terminalRef.current.options.theme = {
       ...XTERM_THEME[theme],
-      background: getPropByClass('bg-background', 'backgroundColor') as string
+      background: getPropByClass('bg-background', 'backgroundColor') as string,
     }
   }, [theme])
 
-  return <div className="w-full h-full" ref={terminalEleRef} />;
-};
+  return <div className="w-full h-full" ref={terminalEleRef} />
+}
 
 Terminal.Multiple = function Multiple() {
   const [activeTerm, setActiveTerm] = useAtom(activeTerminalAtom)
@@ -114,7 +121,7 @@ Terminal.Multiple = function Multiple() {
         ))}
       </div>
 
-      {instances.length > 1 ?
+      {instances.length > 1 ? (
         <TabsList
           className={clsx([
             'text-xs',
@@ -132,13 +139,7 @@ Terminal.Multiple = function Multiple() {
             <TabsTrigger
               key={item.id}
               value={item.id}
-              className={clsx([
-                'w-full',
-                'text-center',
-                'justify-start',
-                'group',
-                'relative',
-              ])}
+              className={clsx(['w-full', 'text-center', 'justify-start', 'group', 'relative'])}
             >
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center">
@@ -147,16 +148,16 @@ Terminal.Multiple = function Multiple() {
                 <BiTrash
                   className="w-4 h-4 opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity"
                   onMouseDown={(e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    removeTerminal(item.id);
+                    e.preventDefault()
+                    e.stopPropagation()
+                    removeTerminal(item.id)
                   }}
                 />
               </div>
             </TabsTrigger>
           ))}
-        </TabsList> : null
-      }
+        </TabsList>
+      ) : null}
     </Tabs>
-  );
-};
+  )
+}

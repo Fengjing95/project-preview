@@ -7,7 +7,7 @@ import { nanoid } from 'nanoid'
 export class TerminalModel {
   id: string // 实例id
   cmd: string // 实例命令
-  name: string  // 实例名称
+  name: string // 实例名称
   process?: WebContainerProcess // 实例进程
   writer?: WritableStreamDefaultWriter // 实例输入流
 
@@ -41,11 +41,11 @@ export const removeTerminalAtom = atom(null, (get, set, id: string) => {
   const activeTerm = get(activeTerminalAtom)
 
   // 新的终端数组
-  const newTerminals = terminals.filter(t => t.id !== id)
+  const newTerminals = terminals.filter((t) => t.id !== id)
   set(terminalsAtom, newTerminals)
 
   // 停止进程
-  const deleteTerm = terminals.find(t => t.id === id)
+  const deleteTerm = terminals.find((t) => t.id === id)
   deleteTerm?.process?.kill()
 
   // 如果删除的是当前激活的终端，则激活最后一个终端

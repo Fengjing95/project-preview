@@ -6,5 +6,5 @@ export enum ServiceStatus {
   MOUNT_FS,
   INSTALL_DEPENDENCY,
   STARTING_SERVER,
-  RUNNING
+  RUNNING,
 }

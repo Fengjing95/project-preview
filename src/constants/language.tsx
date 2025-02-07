@@ -16,7 +16,7 @@ import {
   BiLogoPhp,
   BiLogoVuejs,
   BiCodeBlock,
-} from "react-icons/bi";
+} from 'react-icons/bi'
 
 // 文件后缀-语言映射
 export const LANGUAGE_MAP = {
@@ -49,8 +49,8 @@ export const LANGUAGE_MAP = {
   xml: 'xml',
   sh: 'shell',
   bash: 'shell',
-  sql: 'sql'
-} as const;
+  sql: 'sql',
+} as const
 
 export const LANGUAGE_ICON: Record<keyof typeof LANGUAGE_MAP, React.ReactElement> = {
   ts: <BiLogoTypescript className="text-[#3178C6]" />,

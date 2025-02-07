@@ -1,7 +1,7 @@
-import { forwardRef } from 'react';
+import { forwardRef } from 'react'
 
 interface PreviewProps {
-  url?: string;
+  url?: string
 }
 
 export const Preview = forwardRef<HTMLIFrameElement, PreviewProps>((_, ref) => {
@@ -13,5 +13,5 @@ export const Preview = forwardRef<HTMLIFrameElement, PreviewProps>((_, ref) => {
         sandbox="allow-same-origin allow-scripts allow-popups allow-forms"
       />
     </div>
-  );
-});
+  )
+})

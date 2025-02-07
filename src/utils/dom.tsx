@@ -1,5 +1,5 @@
-import { loader } from "@monaco-editor/react";
-import { rgbToHex } from "./color";
+import { loader } from '@monaco-editor/react'
+import { rgbToHex } from './color'
 
 /**
  * 根据类名获取属性值
@@ -9,17 +9,17 @@ import { rgbToHex } from "./color";
  */
 export function getPropByClass(classname: string, propKey: keyof CSSStyleDeclaration) {
   // 创建一个临时元素
-  const temp = document.createElement('div');
-  temp.className = classname;
-  document.body.appendChild(temp);
+  const temp = document.createElement('div')
+  temp.className = classname
+  document.body.appendChild(temp)
 
   // 获取计算后的样式
-  const color = getComputedStyle(temp)[propKey];
+  const color = getComputedStyle(temp)[propKey]
 
   // 移除临时元素
-  document.body.removeChild(temp);
+  document.body.removeChild(temp)
 
-  return color;
+  return color
 }
 
 /**
@@ -30,7 +30,7 @@ export function getPropByClass(classname: string, propKey: keyof CSSStyleDeclara
  */
 export const splitAndRenderCode = (text: string, separator: string = ',') => {
   // 分割字符串
-  const parts = text.split(separator);
+  const parts = text.split(separator)
 
   // 返回渲染的代码元素数组
   return parts.map((part, index) => (
@@ -40,8 +40,8 @@ export const splitAndRenderCode = (text: string, separator: string = ',') => {
     >
       {part.trim()}
     </code>
-  ));
-};
+  ))
+}
 
 /**
  * 初始化monaco
@@ -51,11 +51,11 @@ export async function initMonaco() {
 
   const background = rgbToHex(getPropByClass('bg-background', 'backgroundColor') as string)
   monaco.editor.defineTheme('dark', {
-    base: "vs-dark",
+    base: 'vs-dark',
     inherit: true,
     rules: [],
     colors: {
-      "editor.background": background,
+      'editor.background': background,
     },
   })
 }
@@ -66,15 +66,13 @@ export async function initMonaco() {
  * @returns
  */
 export const getThemeColor = (variableName: string) => {
-  const value = getComputedStyle(document.documentElement)
-    .getPropertyValue(variableName)
-    .trim();
-  return `hsl(${value})`;
-};
+  const value = getComputedStyle(document.documentElement).getPropertyValue(variableName).trim()
+  return `hsl(${value})`
+}
 
 /**
  * 判断当前页面是否在iframe中
  */
 export function isUseInIframe() {
-  return window !== window.top;
+  return window !== window.top
 }

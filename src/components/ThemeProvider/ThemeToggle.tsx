@@ -1,6 +1,6 @@
-import { useTheme } from "."
-import { Toggle } from "../ui/toggle"
-import { BiMoon, BiSun } from "react-icons/bi"
+import { useTheme } from '.'
+import { Toggle } from '../ui/toggle'
+import { BiMoon, BiSun } from 'react-icons/bi'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()
