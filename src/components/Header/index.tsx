@@ -6,24 +6,29 @@ import {
   AvatarImage,
 } from "@/components/ui/avatar"
 import { Skeleton } from "@/components/ui/skeleton"
-import classnames, { clsx } from 'clsx'
-import {
-  BiDockBottom,
-  BiDockLeft,
-  BiDesktop,
-  BiSolidWindowAlt,
-} from "react-icons/bi";
+import { clsx } from 'clsx'
 import { Toggle } from "@/components/ui/toggle"
 import { leftPanelOpenAtom, bottomPanelOpenAtom } from "@/store/global";
 import { useKeyPress } from "ahooks"
 import { KEY_MAP } from "@/constants/keyboard"
+import {
+  VscGithubInverted,
+  VscLayoutPanel,
+  VscLayoutPanelOff,
+  VscLayoutSidebarLeft,
+  VscLayoutSidebarLeftOff, VscScreenFull,
+} from "react-icons/vsc";
 import { ThemeToggle } from "../ThemeProvider/ThemeToggle"
+import { isUseInIframe } from "@/utils/dom.tsx";
+import {ShareToggle} from "@/components/Header/ShareToggle.tsx";
 
 enum ActionKey {
   LEFT_PANEL = 'leftPanel',
   BOTTOM_PANEL = 'bottomPanel',
   PREVIEW_PANEL = 'previewPanel',
 }
+
+const isInIframe = isUseInIframe()
 
 export function Header() {
   const repoInfo = useAtomValue(repoInfoAtom)
@@ -63,11 +68,7 @@ export function Header() {
             <Skeleton className="w-24 h-6" />
         }
       </a>
-      <BiSolidWindowAlt
-        className="cursor-pointer"
-        title="复制 iframe 嵌入代码"
-        onClick={() => { }}
-      />
+      <ShareToggle />
     </div>
 
     {/* 仓库名称 */}
@@ -76,7 +77,7 @@ export function Header() {
         href={repoInfo?.repoUrl}
         target="_blank"
         title="前往仓库"
-        className={classnames(
+        className={clsx(
           'block',
           'rounded-lg',
           'border',
@@ -104,38 +105,47 @@ export function Header() {
         aria-label="左侧面板"
         title="左侧面板"
         size="sm"
-        className={clsx(
-          // '[&_svg]:size-6',
-          // { 'bg-slate-600': leftPanelOpen }
-        )}
         onClick={() => {
           setLeftPanelOpen(!leftPanelOpen)
         }}
       >
-        <BiDockLeft />
+        {leftPanelOpen ? <VscLayoutSidebarLeft /> : <VscLayoutSidebarLeftOff />}
       </Toggle>
       <Toggle
         value={ActionKey.BOTTOM_PANEL}
         aria-label="底部面板"
         title="底部面板"
         size="sm"
-        className={clsx(
-          // '[&_svg]:size-6',
-          // { 'bg-slate-600': bottomPanelOpen }
-        )}
         onClick={() => {
           setBottomPanelOpen(!bottomPanelOpen)
         }}
       >
-        <BiDockBottom />
+        {bottomPanelOpen ? <VscLayoutPanel /> : <VscLayoutPanelOff />}
       </Toggle>
+      {
+        isInIframe &&
+        <Toggle
+          value={ActionKey.PREVIEW_PANEL}
+          aria-label="全屏"
+          title="全屏"
+          size="sm"
+          onClick={() => {
+            window.open(window.location.href, '_blank')
+          }}
+        >
+          <VscScreenFull />
+        </Toggle>
+      }
       <Toggle
         value={ActionKey.PREVIEW_PANEL}
-        aria-label="预览"
-        title="预览"
+        aria-label="Github"
+        title="Github"
         size="sm"
+        onClick={() => {
+          window.open('https://github.com/Fengjing95/preview-fe-code', '_blank')
+        }}
       >
-        <BiDesktop />
+        <VscGithubInverted />
       </Toggle>
       <ThemeToggle />
     </div>

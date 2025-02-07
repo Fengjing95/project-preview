@@ -4,7 +4,8 @@ import { rgbToHex } from "./color";
 /**
  * 根据类名获取属性值
  * @param classname 类名
- * @returns 
+ * @param propKey 属性名
+ * @returns
  */
 export function getPropByClass(classname: string, propKey: keyof CSSStyleDeclaration) {
   // 创建一个临时元素
@@ -62,7 +63,7 @@ export async function initMonaco() {
 /**
  * 获取css 主题变量值
  * @param variableName css变量名称
- * @returns 
+ * @returns
  */
 export const getThemeColor = (variableName: string) => {
   const value = getComputedStyle(document.documentElement)
@@ -70,3 +71,10 @@ export const getThemeColor = (variableName: string) => {
     .trim();
   return `hsl(${value})`;
 };
+
+/**
+ * 判断当前页面是否在iframe中
+ */
+export function isUseInIframe() {
+  return window !== window.top;
+}
