@@ -99,7 +99,7 @@ function App() {
       {status === ServiceStatus.INIT && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Button size="lg" onClick={handlePreview} disabled={isLoading}>
-            {isLoading ? '加载中...' : '开始预览'}
+            {isLoading ? '加载中...' : '预览'}
           </Button>
         </div>
       )}

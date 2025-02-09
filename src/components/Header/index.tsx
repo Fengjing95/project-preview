@@ -139,7 +139,7 @@ export function Header() {
           title="Github"
           size="sm"
           onClick={() => {
-            window.open('https://github.com/Fengjing95/preview-fe-code', '_blank')
+            window.open('https://github.com/Fengjing95/project-preview', '_blank')
           }}
         >
           <VscGithubInverted />
