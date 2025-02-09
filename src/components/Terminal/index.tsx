@@ -15,7 +15,6 @@ import { BiTerminal, BiTrash } from 'react-icons/bi'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useTheme } from '../ThemeProvider'
 import { XTERM_THEME } from '@/constants/xtermTheme'
-import { getPropByClass } from '@/utils/dom'
 import { cn } from '@/lib/utils'
 
 interface IProps {
@@ -42,7 +41,6 @@ export function Terminal({ instance }: IProps) {
     const terminal = new XTerm({
       theme: {
         ...XTERM_THEME[theme],
-        background: getPropByClass('bg-background', 'backgroundColor') as string,
       },
     }) // 初始化terminal
     terminalRef.current = terminal
@@ -88,7 +86,6 @@ export function Terminal({ instance }: IProps) {
 
     terminalRef.current.options.theme = {
       ...XTERM_THEME[theme],
-      background: getPropByClass('bg-background', 'backgroundColor') as string,
     }
   }, [theme])
 
@@ -141,7 +138,7 @@ Terminal.Multiple = function Multiple() {
               value={item.id}
               className={cn(['w-full', 'text-center', 'justify-start', 'group', 'relative'])}
             >
-              <div className="flex items-center justify-between w-full">
+              <div className="flex items-center justify-between w-full cursor-pointer">
                 <div className="flex items-center">
                   <BiTerminal className="w-4 h-4 mr-2" /> {item.name}
                 </div>

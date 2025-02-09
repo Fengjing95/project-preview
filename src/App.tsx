@@ -19,7 +19,6 @@ import { BiPlus } from 'react-icons/bi'
 import { Welcome } from '@/components/Welcome'
 import { initMonaco } from '@/utils/dom'
 import { Button } from '@/components/ui/button'
-import './App.css'
 import { useAtom } from 'jotai'
 
 function App() {
@@ -149,7 +148,7 @@ function App() {
               <div className="w-full h-full items-center justify-center">
                 <Tabs defaultValue="terminal" className="h-full">
                   <div className="flex justify-between pt-2 pr-4">
-                    <TabsList className="h-6 text-xs">
+                    <TabsList className="text-xs bg-transparent h-6">
                       <TabsTrigger value="terminal">终端</TabsTrigger>
                     </TabsList>
                     <TabsContent value="terminal" className="m-0">

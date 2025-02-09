@@ -27,9 +27,9 @@ const lightTheme: ITheme = {
 // 暗色主题配置
 const darkTheme: ITheme = {
   foreground: '#f8f8f2',
-  background: '#121212',
+  background: '#020817',
   cursor: '#f8f8f2',
-  cursorAccent: '#121212',
+  cursorAccent: '#020817',
   black: '#21222c',
   red: '#ff5555',
   green: '#50fa7b',

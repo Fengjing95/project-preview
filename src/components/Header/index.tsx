@@ -2,7 +2,6 @@ import { baseInfoAtom, repoInfoAtom } from '@/store/repo'
 import { useAtom, useAtomValue } from 'jotai'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { Toggle } from '@/components/ui/toggle'
 import { leftPanelOpenAtom, bottomPanelOpenAtom } from '@/store/global'
 import { useKeyPress } from 'ahooks'
 import { KEY_MAP } from '@/constants/keyboard'
@@ -19,12 +18,8 @@ import { isUseInIframe } from '@/utils/dom.tsx'
 import { ShareToggle } from '@/components/Header/ShareToggle.tsx'
 import { StartToggle } from './StartToggle'
 import { cn } from '@/lib/utils'
-
-enum ActionKey {
-  LEFT_PANEL = 'leftPanel',
-  BOTTOM_PANEL = 'bottomPanel',
-  PREVIEW_PANEL = 'previewPanel',
-}
+import { MyTooltip } from '@/components/Tooltip'
+import { Button } from '@/components/ui/button.tsx'
 
 const isInIframe = isUseInIframe()
 
@@ -98,52 +93,52 @@ export function Header() {
       {/* actions */}
       <div className="flex-1 flex justify-end gap-1">
         <StartToggle />
-        <Toggle
-          value={ActionKey.LEFT_PANEL}
-          aria-label="左侧面板"
-          title="左侧面板"
-          size="sm"
-          onClick={() => {
-            setLeftPanelOpen(!leftPanelOpen)
-          }}
-        >
-          {leftPanelOpen ? <VscLayoutSidebarLeft /> : <VscLayoutSidebarLeftOff />}
-        </Toggle>
-        <Toggle
-          value={ActionKey.BOTTOM_PANEL}
-          aria-label="底部面板"
-          title="底部面板"
-          size="sm"
-          onClick={() => {
-            setBottomPanelOpen(!bottomPanelOpen)
-          }}
-        >
-          {bottomPanelOpen ? <VscLayoutPanel /> : <VscLayoutPanelOff />}
-        </Toggle>
-        {isInIframe && (
-          <Toggle
-            value={ActionKey.PREVIEW_PANEL}
-            aria-label="全屏"
-            title="全屏"
-            size="sm"
+        <MyTooltip message="左侧面板">
+          <Button
+            variant="ghost"
+            className="px-2"
             onClick={() => {
-              window.open(window.location.href, '_blank')
+              setLeftPanelOpen(!leftPanelOpen)
             }}
           >
-            <VscScreenFull />
-          </Toggle>
+            {leftPanelOpen ? <VscLayoutSidebarLeft /> : <VscLayoutSidebarLeftOff />}
+          </Button>
+        </MyTooltip>
+        <MyTooltip message="底部面板">
+          <Button
+            variant="ghost"
+            className="px-2"
+            onClick={() => {
+              setBottomPanelOpen(!bottomPanelOpen)
+            }}
+          >
+            {bottomPanelOpen ? <VscLayoutPanel /> : <VscLayoutPanelOff />}
+          </Button>
+        </MyTooltip>
+        {isInIframe && (
+          <MyTooltip message="新窗口打开">
+            <Button
+              variant="ghost"
+              className="px-2"
+              onClick={() => {
+                window.open(window.location.href, '_blank')
+              }}
+            >
+              <VscScreenFull />
+            </Button>
+          </MyTooltip>
         )}
-        <Toggle
-          value={ActionKey.PREVIEW_PANEL}
-          aria-label="Github"
-          title="Github"
-          size="sm"
-          onClick={() => {
-            window.open('https://github.com/Fengjing95/project-preview', '_blank')
-          }}
-        >
-          <VscGithubInverted />
-        </Toggle>
+        <MyTooltip message="Github">
+          <Button
+            variant="ghost"
+            className="px-2"
+            onClick={() => {
+              window.open('https://github.com/Fengjing95/project-preview', '_blank')
+            }}
+          >
+            <VscGithubInverted />
+          </Button>
+        </MyTooltip>
         <ThemeToggle />
       </div>
     </div>
