@@ -2,7 +2,6 @@ import { baseInfoAtom, repoInfoAtom } from '@/store/repo'
 import { useAtom, useAtomValue } from 'jotai'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { clsx } from 'clsx'
 import { Toggle } from '@/components/ui/toggle'
 import { leftPanelOpenAtom, bottomPanelOpenAtom } from '@/store/global'
 import { useKeyPress } from 'ahooks'
@@ -18,6 +17,8 @@ import {
 import { ThemeToggle } from '../ThemeProvider/ThemeToggle'
 import { isUseInIframe } from '@/utils/dom.tsx'
 import { ShareToggle } from '@/components/Header/ShareToggle.tsx'
+import { StartToggle } from './StartToggle'
+import { cn } from '@/lib/utils'
 
 enum ActionKey {
   LEFT_PANEL = 'leftPanel',
@@ -75,7 +76,7 @@ export function Header() {
           href={repoInfo?.repoUrl}
           target="_blank"
           title="前往仓库"
-          className={clsx(
+          className={cn(
             'block',
             'rounded-lg',
             'border',
@@ -96,6 +97,7 @@ export function Header() {
 
       {/* actions */}
       <div className="flex-1 flex justify-end gap-1">
+        <StartToggle />
         <Toggle
           value={ActionKey.LEFT_PANEL}
           aria-label="左侧面板"

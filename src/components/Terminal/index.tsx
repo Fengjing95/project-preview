@@ -13,10 +13,10 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BiTerminal, BiTrash } from 'react-icons/bi'
 import { useAtom, useAtomValue, useSetAtom } from 'jotai'
-import clsx from 'clsx'
 import { useTheme } from '../ThemeProvider'
 import { XTERM_THEME } from '@/constants/xtermTheme'
 import { getPropByClass } from '@/utils/dom'
+import { cn } from '@/lib/utils'
 
 interface IProps {
   instance: TerminalModel
@@ -123,7 +123,7 @@ Terminal.Multiple = function Multiple() {
 
       {instances.length > 1 ? (
         <TabsList
-          className={clsx([
+          className={cn([
             'text-xs',
             'flex-col',
             'items-start',
@@ -139,7 +139,7 @@ Terminal.Multiple = function Multiple() {
             <TabsTrigger
               key={item.id}
               value={item.id}
-              className={clsx(['w-full', 'text-center', 'justify-start', 'group', 'relative'])}
+              className={cn(['w-full', 'text-center', 'justify-start', 'group', 'relative'])}
             >
               <div className="flex items-center justify-between w-full">
                 <div className="flex items-center">

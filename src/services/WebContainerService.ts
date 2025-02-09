@@ -11,7 +11,7 @@ export class WebContainerService {
   inputWriter: WritableStreamDefaultWriter | undefined
   process: WebContainerProcess | undefined
 
-  private constructor() {}
+  private constructor() { }
 
   /**
    * 实例化containerService

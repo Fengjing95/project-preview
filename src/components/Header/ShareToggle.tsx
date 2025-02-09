@@ -21,7 +21,7 @@ export function ShareToggle() {
 
   return (
     <Dialog>
-      <DialogTrigger>
+      <DialogTrigger asChild>
         <Button variant="secondary" size="sm">
           <VscShare /> 分享
         </Button>
@@ -38,7 +38,7 @@ export function ShareToggle() {
             <Label htmlFor="link">链接</Label>
             <Input id="link" defaultValue={link} readOnly />
           </div>
-          <Button type="submit" className="px-3" onClick={() => copyToClipboard(link)}>
+          <Button onClick={() => copyToClipboard(link)}>
             <Copy />
           </Button>
         </div>
@@ -48,7 +48,7 @@ export function ShareToggle() {
             <Label htmlFor="iframe">Iframe(自行调整宽高)</Label>
             <Input id="iframe" defaultValue={iframeCode} readOnly />
           </div>
-          <Button type="submit" className="px-3" onClick={() => copyToClipboard(iframeCode)}>
+          <Button onClick={() => copyToClipboard(iframeCode)}>
             <Copy />
           </Button>
         </div>

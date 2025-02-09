@@ -1,4 +1,5 @@
 import { atom } from 'jotai'
+import { ServiceStatus } from '@/constants/serviceStatus'
 
 // 左侧面板宽度
 export const leftPanelAtom = atom(25)
@@ -35,3 +36,6 @@ export const resolveBottomPanelAtom = atom((get) => {
     return 0
   }
 })
+
+// 服务启动状态
+export const serviceStatusAtom = atom<ServiceStatus>(ServiceStatus.INIT)

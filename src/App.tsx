@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { WebContainerService } from '@/services/WebContainerService'
 import { Terminal } from '@/components/Terminal'
 import { Preview } from '@/components/Preview'
@@ -12,27 +12,32 @@ import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/componen
 import { Header } from '@/components/Header'
 import { useAtomValue } from 'jotai'
 import { baseInfoAtom } from '@/store/repo'
-import { resolveLeftPanelAtom } from '@/store/global'
+import { resolveLeftPanelAtom, serviceStatusAtom } from '@/store/global'
 import { useResize } from '@/hooks/useResize'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BiPlus } from 'react-icons/bi'
 import { Welcome } from '@/components/Welcome'
 import { initMonaco } from '@/utils/dom'
+import { Button } from '@/components/ui/button'
 import './App.css'
+import { useAtom } from 'jotai'
 
 function App() {
-  const [status, setStatus] = useState(ServiceStatus.INIT)
+  const [status, setStatus] = useAtom(serviceStatusAtom)
   const [currentFile, setCurrentFile] = useState('')
   const previewRef = useRef<HTMLIFrameElement>(null)
   const resolveLeftPanel = useAtomValue(resolveLeftPanelAtom) // 左侧面板的宽度
   const { owner, repo, branch, repository } = useAtomValue(baseInfoAtom)
   const { globalPanelGroupRef, leftPanelResize, mainPanelGroupRef, bottomPanelResize } = useResize()
+  const [isLoading, setIsLoading] = useState(false)
+  const portRef = useRef<number>()
 
   const handlePreview = async () => {
     if (!owner || !repo || !repository) {
       return
     }
 
+    setIsLoading(true)
     try {
       // 获取仓库文件系统
       const { fileSystem } = await repository.fetchRepository(owner, repo, branch)
@@ -57,38 +62,47 @@ function App() {
 
       // 安装依赖
       await container.installDependencies()
-      setStatus(ServiceStatus.INSTALL_DEPENDENCY)
+      setStatus(ServiceStatus.INSTALLED_DEPENDENCY)
       emitEvent(EventName.INSTALLED)
 
-      // 新建终端
-      const terminal = await container.newTerminal()
-      // 启动开发服务器
-      await terminal.writer?.write('npm run dev\r\n')
-      setStatus(ServiceStatus.STARTING_SERVER)
-
       // 监听服务器启动完成事件
-      instance.on('server-ready', (_, url) => {
+      instance.on('server-ready', (port, url) => {
+        // 已存在服务，忽略后续启动的服务
+        if (portRef.current) return
+        portRef.current = port
         if (!previewRef.current) return
         toast('启动成功', {
           description: '仅当前页面内可预览，外部无法访问。',
         })
-        setStatus(ServiceStatus.RUNNING)
         previewRef.current.src = url
+        setStatus(ServiceStatus.RUNNING)
+      })
+
+      instance.on('port', (port, type) => {
+        if (type === 'close' && portRef.current === port) {
+          portRef.current = undefined
+          setStatus(ServiceStatus.INSTALLED_DEPENDENCY)
+        }
       })
 
       // 监听文件变化
       instance.fs.watch('/', () => emitEvent(EventName.FILE_CHANGE))
     } catch (err) {
       toast(err instanceof Error ? err.message : '预览失败')
+    } finally {
+      setIsLoading(false)
     }
   }
 
-  useEffect(() => {
-    handlePreview()
-  }, [])
-
   return (
     <div className="w-full h-[100vh] flex flex-col rounded-2xl border overflow-hidden">
+      {status === ServiceStatus.INIT && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <Button size="lg" onClick={handlePreview} disabled={isLoading}>
+            {isLoading ? '加载中...' : '开始预览'}
+          </Button>
+        </div>
+      )}
       {/* headerPanel */}
       <div className="h-10">
         <Header />
