@@ -1,5 +1,5 @@
+import { IServerInfo } from '@/typings/server'
 import { loader } from '@monaco-editor/react'
-import { rgbToHex } from './color'
 
 /**
  * 根据类名获取属性值
@@ -64,4 +64,39 @@ export async function initMonaco() {
  */
 export function isUseInIframe() {
   return window !== window.top
+}
+
+/**
+ * 解析WebContainer服务器URL
+ * @param url WebContainer服务器URL
+ * @returns 解析后的URL信息
+ */
+export function parseLocalUrl(url: string): IServerInfo & { port: string } {
+  const regex = /^(https?:\/\/)(.+)--(\d+)--([^.]+)\.(.+)$/
+  const match = url.match(regex) || []
+
+  const [, protocol, appId, port, version, khost] = match
+
+  return {
+    protocol,
+    appId,
+    port,
+    version,
+    khost,
+  }
+}
+
+/**
+ * 判断url是否webContainer localUrl
+ * @param url 目标url
+ * @returns
+ */
+export function isLocalUrl(localInfo: IServerInfo, url: string) {
+  const curInfo = parseLocalUrl(url)
+  return (
+    curInfo.appId === localInfo.appId &&
+    curInfo.protocol === localInfo.protocol &&
+    curInfo.version === localInfo.version &&
+    curInfo.khost === localInfo.khost
+  )
 }

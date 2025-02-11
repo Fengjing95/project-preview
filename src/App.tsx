@@ -1,7 +1,7 @@
 import { useState, useRef } from 'react'
 import { WebContainerService } from '@/services/WebContainerService'
 import { Terminal } from '@/components/Terminal'
-import { Preview } from '@/components/Preview'
+import { IPreviewRef, Preview } from '@/components/Preview'
 import { Editor } from '@/components/Editor'
 import { FileTree } from '@/components/FileTree'
 import { ServiceStatus } from '@/constants/serviceStatus'
@@ -10,26 +10,27 @@ import { Toaster } from '@/components/ui/sonner'
 import { toast } from 'sonner'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Header } from '@/components/Header'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { baseInfoAtom } from '@/store/repo'
-import { resolveLeftPanelAtom, serviceStatusAtom } from '@/store/global'
+import { resolveLeftPanelAtom, serverInfoAtom, serviceStatusAtom } from '@/store/global'
 import { useResize } from '@/hooks/useResize'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BiPlus } from 'react-icons/bi'
 import { Welcome } from '@/components/Welcome'
-import { initMonaco } from '@/utils/dom'
+import { initMonaco, parseLocalUrl } from '@/utils/dom'
 import { Button } from '@/components/ui/button'
 import { useAtom } from 'jotai'
 
 function App() {
   const [status, setStatus] = useAtom(serviceStatusAtom)
   const [currentFile, setCurrentFile] = useState('')
-  const previewRef = useRef<HTMLIFrameElement>(null)
+  const previewRef = useRef<IPreviewRef>(null)
   const resolveLeftPanel = useAtomValue(resolveLeftPanelAtom) // 左侧面板的宽度
   const { owner, repo, branch, repository } = useAtomValue(baseInfoAtom)
   const { globalPanelGroupRef, leftPanelResize, mainPanelGroupRef, bottomPanelResize } = useResize()
   const [isLoading, setIsLoading] = useState(false)
   const portRef = useRef<number>()
+  const setServerInfo = useSetAtom(serverInfoAtom)
 
   const handlePreview = async () => {
     if (!owner || !repo || !repository) {
@@ -43,16 +44,16 @@ function App() {
       setStatus(ServiceStatus.PULLING)
 
       // 初始化 WebContainer 服务
-      const container = WebContainerService.getInstance()
+      const instance = WebContainerService.getInstance()
       // 设置输出内容的显示方式
-      container.setOutputCallback((id, data) => {
+      instance.setOutputCallback((id, data) => {
         emitEvent(EventName.CONTAINER_OUTPUT, id, data)
       })
-      const instance = await container.initialize()
+      const container = await instance.initialize()
       setStatus(ServiceStatus.CREATE_INSTANCE)
 
       // 初始化 WebContainer 并写入文件系统
-      await container.writeFiles(fileSystem)
+      await instance.writeFiles(fileSystem)
       setStatus(ServiceStatus.MOUNT_FS)
       emitEvent(EventName.MOUNTED)
 
@@ -60,12 +61,13 @@ function App() {
       await initMonaco()
 
       // 安装依赖
-      await container.installDependencies()
+      await instance.installDependencies()
       setStatus(ServiceStatus.INSTALLED_DEPENDENCY)
       emitEvent(EventName.INSTALLED)
 
       // 监听服务器启动完成事件
-      instance.on('server-ready', (port, url) => {
+      container.on('server-ready', (port, url) => {
+        setServerInfo(parseLocalUrl(url))
         // 已存在服务，忽略后续启动的服务
         if (portRef.current) return
         portRef.current = port
@@ -73,11 +75,11 @@ function App() {
         toast('启动成功', {
           description: '仅当前页面内可预览，外部无法访问。',
         })
-        previewRef.current.src = url
+        previewRef.current?.setUrl(url)
         setStatus(ServiceStatus.RUNNING)
       })
 
-      instance.on('port', (port, type) => {
+      container.on('port', (port, type) => {
         if (type === 'close' && portRef.current === port) {
           portRef.current = undefined
           setStatus(ServiceStatus.INSTALLED_DEPENDENCY)
@@ -85,7 +87,7 @@ function App() {
       })
 
       // 监听文件变化
-      instance.fs.watch('/', () => emitEvent(EventName.FILE_CHANGE))
+      container.fs.watch('/', () => emitEvent(EventName.FILE_CHANGE))
     } catch (err) {
       toast(err instanceof Error ? err.message : '预览失败')
     } finally {
