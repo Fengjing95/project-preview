@@ -1,4 +1,4 @@
-import { forwardRef, useImperativeHandle, useRef, useState } from 'react'
+import { forwardRef, useImperativeHandle, useRef } from 'react'
 import { BiRefresh } from 'react-icons/bi'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -14,7 +14,7 @@ export interface IPreviewRef {
 export const Preview = forwardRef<IPreviewRef>((_, ref) => {
   const addressInputRef = useRef<HTMLInputElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
-  const [currentUrl, setCurrentUrl] = useState('')
+  const currentUrlRef = useRef('')
   const serverInfo = useAtomValue(serverInfoAtom)
 
   const handleRefresh = () => {
@@ -28,7 +28,7 @@ export const Preview = forwardRef<IPreviewRef>((_, ref) => {
     const url = addressInputRef.current?.value || ''
     if (isLocalUrl(serverInfo, url)) {
       iframeRef.current.src = url
-      setCurrentUrl(url)
+      currentUrlRef.current = url
     } else {
       resetUrl()
     }
@@ -37,7 +37,7 @@ export const Preview = forwardRef<IPreviewRef>((_, ref) => {
 
   const resetUrl = () => {
     if (!addressInputRef.current) return
-    addressInputRef.current.value = currentUrl
+    addressInputRef.current.value = currentUrlRef.current
   }
 
   useImperativeHandle(ref, () => ({
@@ -46,7 +46,7 @@ export const Preview = forwardRef<IPreviewRef>((_, ref) => {
       iframeRef.current.src = url
       if (!addressInputRef.current) return
       addressInputRef.current.value = url
-      setCurrentUrl(url)
+      currentUrlRef.current = url
     },
   }))
 
@@ -55,7 +55,7 @@ export const Preview = forwardRef<IPreviewRef>((_, ref) => {
       <div className="flex items-center gap-1 p-1 border-b">
         <div className="flex gap-0.5">
           <Button
-            disabled={!currentUrl}
+            disabled={!serverInfo.appId}
             onClick={handleRefresh}
             variant="ghost"
             size="sm"
@@ -69,8 +69,8 @@ export const Preview = forwardRef<IPreviewRef>((_, ref) => {
             ref={addressInputRef}
             type="text"
             className="bg-secondary h-7 text-sm"
-            // onBlur={resetUrl}
-            disabled={!currentUrl}
+            onBlur={resetUrl}
+            disabled={!serverInfo.appId}
           />
         </form>
       </div>
