@@ -4,11 +4,12 @@ import {
   bottomPanelOpenAtom,
   leftPanelAtom,
   leftPanelOpenAtom,
+  previewPanelOpenAtom,
   resolveBottomPanelAtom,
   resolveLeftPanelAtom,
 } from '@/store/global'
 import { useThrottleFn } from 'ahooks'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { useEffect, useRef } from 'react'
 
 export function useResize() {
@@ -18,10 +19,13 @@ export function useResize() {
   const setBottomPanel = useSetAtom(bottomPanelAtom) // 设置底部面板的高度
   const setBottomPanelOpen = useSetAtom(bottomPanelOpenAtom) // 底部面板是否打开
   const resolveBottomPanel = useAtomValue(resolveBottomPanelAtom) // 底部面板的高度
+  const [previewPanelOpen, setPreviewPanelOpen] = useAtom(previewPanelOpenAtom) // 预览面板
   // 全局面板的布局
   const globalPanelGroupRef = useRef<ResizablePrimitive.ImperativePanelGroupHandle>(null)
   // 主面板的布局
   const mainPanelGroupRef = useRef<ResizablePrimitive.ImperativePanelGroupHandle>(null)
+  // 预览面板的布局
+  const previewPanelGroupRef = useRef<ResizablePrimitive.ImperativePanelGroupHandle>(null)
 
   // 左侧面板的拖拽事件
   const { run: leftPanelResize } = useThrottleFn(
@@ -63,6 +67,20 @@ export function useResize() {
     },
   )
 
+  const { run: previewPanelResize } = useThrottleFn(
+    (size: number) => {
+      if (!size) {
+        // 高度为0，设置不可见
+        setPreviewPanelOpen(false)
+      } else {
+        setPreviewPanelOpen(true)
+      }
+    },
+    {
+      wait: 100,
+    },
+  )
+
   useEffect(() => {
     // 全局面板比例变化时更新主面板布局
     globalPanelGroupRef.current?.setLayout([resolveLeftPanel, 100 - resolveLeftPanel])
@@ -73,10 +91,16 @@ export function useResize() {
     mainPanelGroupRef.current?.setLayout([100 - resolveBottomPanel, resolveBottomPanel])
   }, [resolveBottomPanel])
 
+  useEffect(() => {
+    previewPanelGroupRef.current?.setLayout(previewPanelOpen ? [50, 50] : [100, 0])
+  }, [previewPanelOpen])
+
   return {
     leftPanelResize,
     globalPanelGroupRef,
     mainPanelGroupRef,
     bottomPanelResize,
+    previewPanelGroupRef,
+    previewPanelResize,
   }
 }

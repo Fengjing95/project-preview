@@ -27,7 +27,14 @@ function App() {
   const previewRef = useRef<IPreviewRef>(null)
   const resolveLeftPanel = useAtomValue(resolveLeftPanelAtom) // 左侧面板的宽度
   const { owner, repo, branch, repository } = useAtomValue(baseInfoAtom)
-  const { globalPanelGroupRef, leftPanelResize, mainPanelGroupRef, bottomPanelResize } = useResize()
+  const {
+    globalPanelGroupRef,
+    leftPanelResize,
+    mainPanelGroupRef,
+    bottomPanelResize,
+    previewPanelResize,
+    previewPanelGroupRef,
+  } = useResize()
   const [isLoading, setIsLoading] = useState(false)
   const portRef = useRef<number>()
   const setServerInfo = useSetAtom(serverInfoAtom)
@@ -130,7 +137,7 @@ function App() {
         <ResizablePanel defaultSize={100 - resolveLeftPanel}>
           <ResizablePanelGroup direction="vertical" ref={mainPanelGroupRef}>
             <ResizablePanel defaultSize={75}>
-              <ResizablePanelGroup direction="horizontal">
+              <ResizablePanelGroup direction="horizontal" ref={previewPanelGroupRef}>
                 {/* editor */}
                 <ResizablePanel defaultSize={50}>
                   <div className="flex h-full items-center justify-center">
@@ -139,7 +146,12 @@ function App() {
                 </ResizablePanel>
                 <ResizableHandle />
                 {/* preview */}
-                <ResizablePanel defaultSize={50}>
+                <ResizablePanel
+                  defaultSize={50}
+                  onResize={previewPanelResize}
+                  minSize={20}
+                  collapsible
+                >
                   <Preview ref={previewRef} />
                 </ResizablePanel>
               </ResizablePanelGroup>

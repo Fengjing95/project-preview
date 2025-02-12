@@ -2,7 +2,7 @@ import { baseInfoAtom, repoInfoAtom } from '@/store/repo'
 import { useAtom, useAtomValue } from 'jotai'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { leftPanelOpenAtom, bottomPanelOpenAtom } from '@/store/global'
+import { leftPanelOpenAtom, bottomPanelOpenAtom, previewPanelOpenAtom } from '@/store/global'
 import { useKeyPress } from 'ahooks'
 import { KEY_MAP } from '@/constants/keyboard'
 import {
@@ -11,6 +11,8 @@ import {
   VscLayoutPanelOff,
   VscLayoutSidebarLeft,
   VscLayoutSidebarLeftOff,
+  VscLayoutSidebarRight,
+  VscLayoutSidebarRightOff,
   VscScreenFull,
 } from 'react-icons/vsc'
 import { ThemeToggle } from '../ThemeProvider/ThemeToggle'
@@ -28,6 +30,7 @@ export function Header() {
   const { owner, repo } = useAtomValue(baseInfoAtom)
   const [leftPanelOpen, setLeftPanelOpen] = useAtom(leftPanelOpenAtom)
   const [bottomPanelOpen, setBottomPanelOpen] = useAtom(bottomPanelOpenAtom)
+  const [previewPanelOpen, setPreviewPanelOpen] = useAtom(previewPanelOpenAtom) // 预览面板
 
   useKeyPress(KEY_MAP.fileTree.key, () => {
     setLeftPanelOpen(!leftPanelOpen)
@@ -113,6 +116,17 @@ export function Header() {
             }}
           >
             {bottomPanelOpen ? <VscLayoutPanel /> : <VscLayoutPanelOff />}
+          </Button>
+        </MyTooltip>
+        <MyTooltip message="预览面板">
+          <Button
+            variant="ghost"
+            className="px-2"
+            onClick={() => {
+              setPreviewPanelOpen(!previewPanelOpen)
+            }}
+          >
+            {previewPanelOpen ? <VscLayoutSidebarRight /> : <VscLayoutSidebarRightOff />}
           </Button>
         </MyTooltip>
         {isInIframe && (

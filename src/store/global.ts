@@ -38,6 +38,9 @@ export const resolveBottomPanelAtom = atom((get) => {
   }
 })
 
+// 预览面板是否打开
+export const previewPanelOpenAtom = atom(true)
+
 // 服务启动状态
 export const serviceStatusAtom = atom<ServiceStatus>(ServiceStatus.INIT)
 
