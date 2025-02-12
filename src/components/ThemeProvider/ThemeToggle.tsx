@@ -1,7 +1,7 @@
 import { useTheme } from '.'
 import { BiMoon, BiSun } from 'react-icons/bi'
 import { Button } from '@/components/ui/button.tsx'
-import { MyTooltip } from '@/components/Tooltip'
+import { MyTooltip } from '@/components/MyTooltip'
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme()

@@ -18,7 +18,7 @@ import { isUseInIframe } from '@/utils/dom.tsx'
 import { ShareToggle } from '@/components/Header/ShareToggle.tsx'
 import { StartToggle } from './StartToggle'
 import { cn } from '@/lib/utils'
-import { MyTooltip } from '@/components/Tooltip'
+import { MyTooltip } from '@/components/MyTooltip'
 import { Button } from '@/components/ui/button.tsx'
 
 const isInIframe = isUseInIframe()

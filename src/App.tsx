@@ -96,7 +96,7 @@ function App() {
   }
 
   return (
-    <div className="w-full h-[100vh] flex flex-col rounded-2xl border overflow-hidden">
+    <div className="w-full h-[100vh] flex flex-col border overflow-hidden">
       {status === ServiceStatus.INIT && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
           <Button size="lg" onClick={handlePreview} disabled={isLoading}>
