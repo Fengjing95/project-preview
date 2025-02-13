@@ -1,32 +1,28 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { WebContainerService } from '@/services/WebContainerService'
 import { Terminal } from '@/components/Terminal'
 import { IPreviewRef, Preview } from '@/components/Preview'
 import { Editor } from '@/components/Editor'
 import { FileTree } from '@/components/FileTree'
 import { ServiceStatus } from '@/constants/serviceStatus'
-import { emitEvent, EventName } from '@/utils/evenemitter'
 import { Toaster } from '@/components/ui/sonner'
-import { toast } from 'sonner'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { Header } from '@/components/Header'
-import { useAtomValue, useSetAtom } from 'jotai'
-import { baseInfoAtom } from '@/store/repo'
-import { resolveLeftPanelAtom, serverInfoAtom, serviceStatusAtom } from '@/store/global'
+import { useAtomValue } from 'jotai'
+import { resolveLeftPanelAtom, serviceStatusAtom } from '@/store/global'
 import { useResize } from '@/hooks/useResize'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BiPlus } from 'react-icons/bi'
 import { Welcome } from '@/components/Welcome'
-import { initMonaco, parseLocalUrl } from '@/utils/dom'
+import { initMonaco, isUseInIframe } from '@/utils/dom'
 import { Button } from '@/components/ui/button'
-import { useAtom } from 'jotai'
+import { useContainer } from './hooks/useContainer'
 
 function App() {
-  const [status, setStatus] = useAtom(serviceStatusAtom)
+  const status = useAtomValue(serviceStatusAtom)
   const [currentFile, setCurrentFile] = useState('')
   const previewRef = useRef<IPreviewRef>(null)
   const resolveLeftPanel = useAtomValue(resolveLeftPanelAtom) // 左侧面板的宽度
-  const { owner, repo, branch, repository } = useAtomValue(baseInfoAtom)
   const {
     globalPanelGroupRef,
     leftPanelResize,
@@ -35,79 +31,28 @@ function App() {
     previewPanelResize,
     previewPanelGroupRef,
   } = useResize()
-  const [isLoading, setIsLoading] = useState(false)
   const portRef = useRef<number>()
-  const setServerInfo = useSetAtom(serverInfoAtom)
+  const { coreInit } = useContainer({
+    portRef,
+    previewRef,
+  })
 
-  const handlePreview = async () => {
-    if (!owner || !repo || !repository) {
-      return
+  useEffect(() => {
+    // 初始化编辑器
+    initMonaco()
+    // iframe中不自动执行
+    if (!isUseInIframe()) {
+      // 初始化核心服务
+      coreInit()
     }
-
-    setIsLoading(true)
-    try {
-      // 获取仓库文件系统
-      const { fileSystem } = await repository.fetchRepository(owner, repo, branch)
-      setStatus(ServiceStatus.PULLING)
-
-      // 初始化 WebContainer 服务
-      const instance = WebContainerService.getInstance()
-      // 设置输出内容的显示方式
-      instance.setOutputCallback((id, data) => {
-        emitEvent(EventName.CONTAINER_OUTPUT, id, data)
-      })
-      const container = await instance.initialize()
-      setStatus(ServiceStatus.CREATE_INSTANCE)
-
-      // 初始化 WebContainer 并写入文件系统
-      await instance.writeFiles(fileSystem)
-      setStatus(ServiceStatus.MOUNT_FS)
-      emitEvent(EventName.MOUNTED)
-
-      // 初始化编辑器
-      await initMonaco()
-
-      // 安装依赖
-      await instance.installDependencies()
-      setStatus(ServiceStatus.INSTALLED_DEPENDENCY)
-      emitEvent(EventName.INSTALLED)
-
-      // 监听服务器启动完成事件
-      container.on('server-ready', (port, url) => {
-        setServerInfo(parseLocalUrl(url))
-        // 已存在服务，忽略后续启动的服务
-        if (portRef.current) return
-        portRef.current = port
-        if (!previewRef.current) return
-        toast('启动成功', {
-          description: '仅当前页面内可预览，外部无法访问。',
-        })
-        previewRef.current?.setUrl(url)
-        setStatus(ServiceStatus.RUNNING)
-      })
-
-      container.on('port', (port, type) => {
-        if (type === 'close' && portRef.current === port) {
-          portRef.current = undefined
-          setStatus(ServiceStatus.INSTALLED_DEPENDENCY)
-        }
-      })
-
-      // 监听文件变化
-      container.fs.watch('/', () => emitEvent(EventName.FILE_CHANGE))
-    } catch (err) {
-      toast(err instanceof Error ? err.message : '预览失败')
-    } finally {
-      setIsLoading(false)
-    }
-  }
+  }, [])
 
   return (
     <div className="w-full h-[100vh] flex flex-col border overflow-hidden">
       {status === ServiceStatus.INIT && (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-          <Button size="lg" onClick={handlePreview} disabled={isLoading}>
-            {isLoading ? '加载中...' : '预览'}
+          <Button size="lg" onClick={coreInit}>
+            预览
           </Button>
         </div>
       )}

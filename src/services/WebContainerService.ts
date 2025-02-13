@@ -1,4 +1,7 @@
+import { ServiceStatus } from '@/constants/serviceStatus'
+import { serviceStatusAtom } from '@/store/global'
 import { TerminalModel, activeTerminalAtom, addTerminalAtom } from '@/store/terminal'
+import { emitEvent, EventName } from '@/utils/evenemitter'
 import { FileSystemTree, WebContainer, WebContainerProcess } from '@webcontainer/api'
 import { getDefaultStore } from 'jotai'
 
@@ -11,6 +14,7 @@ export class WebContainerService {
   inputWriter: WritableStreamDefaultWriter | undefined
   process: WebContainerProcess | undefined
 
+  // eslint-disable-next-line prettier/prettier
   private constructor() { }
 
   /**
@@ -41,6 +45,9 @@ export class WebContainerService {
     }
 
     await this.webContainerInstance.mount(fileSystem)
+    const store = getDefaultStore()
+    store.set(serviceStatusAtom, ServiceStatus.MOUNT_FS)
+    emitEvent(EventName.MOUNTED)
   }
 
   /**
@@ -51,14 +58,13 @@ export class WebContainerService {
       throw new Error('WebContainer not initialized')
     }
     const term = await this.newTerminal('npm', ['install'])
-
+    let status = true
     // 安装依赖
     const code = await term.process?.exit
     if (code !== 0) {
-      this.outputCallback(term.id, '依赖安装失败，请手动安装或者刷新页面')
-      throw new Error('Failed to install dependencies')
+      status = false
     }
-    this.outputCallback(term.id, '依赖安装完成，当前终端已失效')
+    return { status, term }
   }
 
   /**
