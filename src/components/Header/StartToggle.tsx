@@ -8,7 +8,7 @@ import { removeTerminalAtom, TerminalModel } from '@/store/terminal'
 import { useAtom, useSetAtom } from 'jotai'
 import { serviceStatusAtom } from '@/store/global'
 import { ServiceStatus } from '@/constants/serviceStatus'
-import { isEqualStatus } from '@/utils/serviceStatus'
+import { isEqualStatus } from '@/lib/serviceStatus'
 
 export function StartToggle() {
   const [command, setCommand] = useState('npm run dev')

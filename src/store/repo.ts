@@ -1,5 +1,5 @@
 import { RepositoryAdapter } from '@/adapters/RepositoryAdapter'
-import { getSearchParams } from '@/utils/params'
+import { getSearchParams } from '@/lib/params'
 import { atom } from 'jotai'
 import { atomWithCache } from 'jotai-cache'
 import { GitHubAdapter } from '@/adapters/GitHubAdapter.ts'

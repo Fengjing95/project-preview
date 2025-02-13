@@ -1,7 +1,7 @@
 import { ServiceStatus } from '@/constants/serviceStatus'
 import { serviceStatusAtom } from '@/store/global'
 import { TerminalModel, activeTerminalAtom, addTerminalAtom } from '@/store/terminal'
-import { emitEvent, EventName } from '@/utils/evenemitter'
+import { emitEvent, EventName } from '@/lib/evenemitter'
 import { FileSystemTree, WebContainer, WebContainerProcess } from '@webcontainer/api'
 import { getDefaultStore } from 'jotai'
 

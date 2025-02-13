@@ -13,7 +13,7 @@ import { VscShare } from 'react-icons/vsc'
 import { Copy } from 'lucide-react'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
-import { copyToClipboard } from '@/utils/clipboard.ts'
+import { copyToClipboard } from '@/lib/clipboard'
 
 export function ShareToggle() {
   const link = window.location.href

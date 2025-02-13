@@ -16,7 +16,7 @@ import {
   VscLinkExternal,
 } from 'react-icons/vsc'
 import { ThemeToggle } from '../ThemeProvider/ThemeToggle'
-import { isUseInIframe } from '@/utils/dom.tsx'
+import { isUseInIframe } from '@/lib/dom'
 import { ShareToggle } from '@/components/Header/ShareToggle.tsx'
 import { StartToggle } from './StartToggle'
 import { cn } from '@/lib/utils'

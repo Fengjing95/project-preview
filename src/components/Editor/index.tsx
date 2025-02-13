@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 import MonacoEditor, { OnMount } from '@monaco-editor/react'
 import { WebContainerService } from '../../services/WebContainerService'
-import { getFileLang } from '@/utils/getFileLang'
+import { getFileLang } from '@/lib/getFileLang'
 import { useKeyPress } from 'ahooks'
 import { KEY_MAP } from '@/constants/keyboard'
 import { useTheme } from '../ThemeProvider'

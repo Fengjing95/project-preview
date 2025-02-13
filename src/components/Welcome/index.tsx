@@ -1,5 +1,5 @@
 import { KEY_MAP } from '@/constants/keyboard'
-import { splitAndRenderCode } from '@/utils/dom'
+import { splitAndRenderCode } from '@/lib/dom'
 
 export function Welcome() {
   return (

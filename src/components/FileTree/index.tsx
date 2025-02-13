@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react'
 import { WebContainerService } from '../../services/WebContainerService'
-import { bindEvent, EventName, removeEvent } from '@/utils/evenemitter'
+import { bindEvent, EventName, removeEvent } from '@/lib/evenemitter'
 import { BiFolder, BiFolderOpen } from 'react-icons/bi'
-import { getFileIcon } from '@/utils/getFileLang'
+import { getFileIcon } from '@/lib/getFileLang'
 
 interface FileTreeProps {
   onSelect?: (filePath: string) => void

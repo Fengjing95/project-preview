@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import { Terminal as XTerm } from '@xterm/xterm'
 import { FitAddon } from '@xterm/addon-fit'
 import '@xterm/xterm/css/xterm.css'
-import { bindEvent, EventName, removeEvent } from '@/utils/evenemitter'
+import { bindEvent, EventName, removeEvent } from '@/lib/evenemitter'
 import { useThrottleFn } from 'ahooks'
 import {
   activeTerminalAtom,

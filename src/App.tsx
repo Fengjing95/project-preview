@@ -14,7 +14,7 @@ import { useResize } from '@/hooks/useResize'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BiPlus } from 'react-icons/bi'
 import { Welcome } from '@/components/Welcome'
-import { initMonaco, isUseInIframe } from '@/utils/dom'
+import { initMonaco, isUseInIframe } from '@/lib/dom'
 import { Button } from '@/components/ui/button'
 import { useContainer } from './hooks/useContainer'
 
@@ -84,7 +84,7 @@ function App() {
             <ResizablePanel defaultSize={75}>
               <ResizablePanelGroup direction="horizontal" ref={previewPanelGroupRef}>
                 {/* editor */}
-                <ResizablePanel defaultSize={50}>
+                <ResizablePanel defaultSize={50} minSize={20}>
                   <div className="flex h-full items-center justify-center">
                     {!currentFile ? <Welcome /> : <Editor filePath={currentFile} />}
                   </div>
