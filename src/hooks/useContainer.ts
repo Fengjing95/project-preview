@@ -90,7 +90,7 @@ export function useContainer(props: IProps) {
         action: {
           label: '重试',
           onClick: () => {
-            instance.installDependencies()
+            installDependency()
             removeTerminal(term.id)
           },
         },
