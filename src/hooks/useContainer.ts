@@ -62,7 +62,7 @@ export function useContainer(props: IProps) {
   // 下载文件并挂载
   async function mountFileSystem() {
     if (!owner || !repo || !repository) {
-      return
+      throw new Error('仓库信息缺失，无法拉取代码')
     }
     const instance = WebContainerService.getInstance()
     // 获取仓库内容转为文件系统格式
