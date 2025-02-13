@@ -6,6 +6,9 @@ import { isLocalUrl } from '@/utils/dom'
 import { reloadPreview } from '@webcontainer/api'
 import { useAtomValue } from 'jotai'
 import { serverInfoAtom } from '@/store/global'
+import { MyTooltip } from '../MyTooltip'
+import { VscScreenFull, VscScreenNormal } from 'react-icons/vsc'
+import { useFullscreen } from 'ahooks'
 
 export interface IPreviewRef {
   setUrl: (url: string) => void
@@ -14,6 +17,7 @@ export interface IPreviewRef {
 export const Preview = forwardRef<IPreviewRef>((_, ref) => {
   const addressInputRef = useRef<HTMLInputElement>(null)
   const iframeRef = useRef<HTMLIFrameElement>(null)
+  const previewRef = useRef<HTMLIFrameElement>(null)
   const currentUrlRef = useRef('')
   const serverInfo = useAtomValue(serverInfoAtom)
 
@@ -50,8 +54,12 @@ export const Preview = forwardRef<IPreviewRef>((_, ref) => {
     },
   }))
 
+  const [isFullscreen, { toggleFullscreen }] = useFullscreen(previewRef, {
+    pageFullscreen: true,
+  })
+
   return (
-    <div className="h-full w-full flex flex-col">
+    <div className="h-full w-full flex flex-col bg-background" ref={previewRef}>
       <div className="flex items-center gap-1 p-1 border-b">
         <div className="flex gap-0.5">
           <Button
@@ -73,6 +81,11 @@ export const Preview = forwardRef<IPreviewRef>((_, ref) => {
             disabled={!serverInfo.appId}
           />
         </form>
+        <MyTooltip message="全屏/还原">
+          <Button disabled={!serverInfo.appId} variant="ghost" size="sm" onClick={toggleFullscreen}>
+            {isFullscreen ? <VscScreenNormal /> : <VscScreenFull />}
+          </Button>
+        </MyTooltip>
       </div>
       <div className="flex-1">
         <iframe

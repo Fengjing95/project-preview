@@ -13,7 +13,7 @@ import {
   VscLayoutSidebarLeftOff,
   VscLayoutSidebarRight,
   VscLayoutSidebarRightOff,
-  VscScreenFull,
+  VscLinkExternal,
 } from 'react-icons/vsc'
 import { ThemeToggle } from '../ThemeProvider/ThemeToggle'
 import { isUseInIframe } from '@/utils/dom.tsx'
@@ -138,7 +138,7 @@ export function Header() {
                 window.open(window.location.href, '_blank')
               }}
             >
-              <VscScreenFull />
+              <VscLinkExternal />
             </Button>
           </MyTooltip>
         )}
