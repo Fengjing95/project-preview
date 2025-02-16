@@ -1,4 +1,4 @@
-import { baseInfoAtom, repoInfoAtom } from '@/store/repo'
+import { baseInfoAtom, gitInfoAtom } from '@/store/repo'
 import { useAtom, useAtomValue } from 'jotai'
 import { leftPanelOpenAtom, bottomPanelOpenAtom, previewPanelOpenAtom } from '@/store/global'
 import { useKeyPress } from 'ahooks'
@@ -24,7 +24,7 @@ import { Button } from '@/components/ui/button'
 const isInIframe = isUseInIframe()
 
 export function Header() {
-  const repoInfo = useAtomValue(repoInfoAtom)
+  const gitInfo = useAtomValue(gitInfoAtom)
   const { owner, repo } = useAtomValue(baseInfoAtom)
   const [leftPanelOpen, setLeftPanelOpen] = useAtom(leftPanelOpenAtom)
   const [bottomPanelOpen, setBottomPanelOpen] = useAtom(bottomPanelOpenAtom)
@@ -49,7 +49,7 @@ export function Header() {
       {/* 仓库名称 */}
       <div className="flex-1 flex justify-center">
         <a
-          href={repoInfo?.repoUrl}
+          href={gitInfo?.repoInfo.url}
           target="_blank"
           title="前往仓库"
           className={cn(

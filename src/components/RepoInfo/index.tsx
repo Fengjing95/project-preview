@@ -1,5 +1,5 @@
 import { useAtomValue } from 'jotai'
-import { baseInfoAtom, repoInfoAtom } from '@/store/repo'
+import { baseInfoAtom, gitInfoAtom } from '@/store/repo'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
 import { VscGithubInverted, VscRepoForked, VscEye } from 'react-icons/vsc'
@@ -14,7 +14,7 @@ interface RepoStats {
 }
 
 export function RepoInfo() {
-  const repoInfo = useAtomValue(repoInfoAtom)
+  const gitInfo = useAtomValue(gitInfoAtom)
   const { owner, repo, repository } = useAtomValue(baseInfoAtom)
   const [stats, setStats] = useState<RepoStats | null>(null)
 
@@ -28,21 +28,26 @@ export function RepoInfo() {
     <div className="p-4">
       {/* 作者信息 */}
       <div className="flex items-center gap-2 mb-2">
-        {repoInfo?.ownerInfo ? (
+        {gitInfo?.ownerInfo ? (
           <Avatar className="w-10 h-10">
-            <AvatarImage src={repoInfo.ownerInfo.avatar} alt={repoInfo.ownerInfo.name} />
-            <AvatarFallback>{repoInfo.ownerInfo.name.slice(0, 2)}</AvatarFallback>
+            <AvatarImage src={gitInfo.ownerInfo.avatar} alt={gitInfo.ownerInfo.name} />
+            <AvatarFallback>{gitInfo.ownerInfo.name.slice(0, 2)}</AvatarFallback>
           </Avatar>
         ) : (
           <Skeleton className="w-10 h-10 rounded-full" />
         )}
         <div className="flex-1">
-          {repoInfo?.ownerInfo ? (
+          {gitInfo?.ownerInfo ? (
             <>
-              <div className="text-sm font-semibold">{repoInfo.ownerInfo.name}</div>
-              <p className="text-sm text-muted-foreground">{repoInfo.ownerInfo.bio}</p>
-              {repoInfo.ownerInfo.company && (
-                <p className="text-sm text-muted-foreground">{repoInfo.ownerInfo.company}</p>
+              <div
+                className="text-sm font-semibold cursor-pointer"
+                onClick={() => window.open(gitInfo.ownerInfo.htmlUrl)}
+              >
+                {gitInfo.ownerInfo.name}
+              </div>
+              <p className="text-sm text-muted-foreground">{gitInfo.ownerInfo.bio}</p>
+              {gitInfo.ownerInfo.company && (
+                <p className="text-sm text-muted-foreground">{gitInfo.ownerInfo.company}</p>
               )}
             </>
           ) : (
@@ -56,8 +61,13 @@ export function RepoInfo() {
 
       {/* 仓库名称 */}
       <div className="mb-2">
-        {repoInfo?.repoUrl ? (
-          <div className="text-sm">{repo}</div>
+        {gitInfo?.repoInfo.url ? (
+          <div
+            className="text-sm cursor-pointer"
+            onClick={() => window.open(gitInfo?.repoInfo.url)}
+          >
+            {repo}
+          </div>
         ) : (
           <Skeleton className="h-8 w-48" />
         )}

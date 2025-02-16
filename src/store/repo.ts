@@ -43,12 +43,12 @@ export const baseInfoAtom = atom(
 )
 
 // 仓库信息
-export const repoInfoAtom = atomWithCache(async (get) => {
+export const gitInfoAtom = atomWithCache(async (get) => {
   const adaptor = get(repositoryAtom)
   const { owner, repo } = get(baseInfoAtom)
 
   if (!adaptor || !owner || !repo) return
   const ownerInfo = await adaptor.getOwnerInfo(owner)
   const repoInfo = await adaptor.getRepositoryStats(owner, repo)
-  return { ownerInfo, repoUrl: repoInfo.url }
+  return { ownerInfo, repoInfo }
 })
