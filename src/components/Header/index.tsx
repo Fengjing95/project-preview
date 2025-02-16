@@ -13,13 +13,13 @@ import {
   VscLayoutSidebarRightOff,
   VscLinkExternal,
 } from 'react-icons/vsc'
-import { ThemeToggle } from '../ThemeProvider/ThemeToggle'
+import { ThemeToggle } from '@/components/ThemeProvider/ThemeToggle'
 import { isUseInIframe } from '@/lib/dom'
-import { ShareToggle } from '@/components/Header/ShareToggle.tsx'
+import { ShareToggle } from './ShareToggle'
 import { StartToggle } from './StartToggle'
 import { cn } from '@/lib/utils'
-import { MyTooltip } from '@/components/MyTooltip'
-import { Button } from '@/components/ui/button.tsx'
+import { MyTooltip } from '@/components'
+import { Button } from '@/components/ui/button'
 
 const isInIframe = isUseInIframe()
 

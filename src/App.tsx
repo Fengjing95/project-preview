@@ -1,24 +1,26 @@
 import { useState, useRef, useEffect } from 'react'
 import { WebContainerService } from '@/services/WebContainerService'
-import { Terminal } from '@/components/Terminal'
-import { IPreviewRef, Preview } from '@/components/Preview'
-import { Editor } from '@/components/Editor'
-import { FileTree } from '@/components/FileTree'
+import {
+  Terminal,
+  IPreviewRef,
+  Preview,
+  Editor,
+  FileTree,
+  Header,
+  Welcome,
+  PanelGroup,
+  RepoInfo,
+} from '@/components'
 import { ServiceStatus } from '@/constants/serviceStatus'
 import { Toaster } from '@/components/ui/sonner'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
-import { Header } from '@/components/Header'
 import { useAtomValue } from 'jotai'
 import { resolveLeftPanelAtom, serviceStatusAtom } from '@/store/global'
-import { useResize } from '@/hooks/useResize'
+import { useResize, useContainer } from '@/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BiPlus } from 'react-icons/bi'
-import { Welcome } from '@/components/Welcome'
 import { initMonaco, isUseInIframe } from '@/lib/dom'
 import { Button } from '@/components/ui/button'
-import { useContainer } from '@/hooks/useContainer'
-import { PanelGroup } from '@/components/PanelGroup'
-import { RepoInfo } from '@/components/RepoInfo'
 
 function App() {
   const status = useAtomValue(serviceStatusAtom)

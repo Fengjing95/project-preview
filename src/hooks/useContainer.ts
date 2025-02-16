@@ -1,4 +1,4 @@
-import { IPreviewRef } from '@/components/Preview'
+import { IPreviewRef } from '@/components'
 import { ServiceStatus } from '@/constants/serviceStatus'
 import { WebContainerService } from '@/services/WebContainerService'
 import { serverInfoAtom, serviceStatusAtom } from '@/store/global'
