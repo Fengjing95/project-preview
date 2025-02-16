@@ -16,7 +16,9 @@ import { BiPlus } from 'react-icons/bi'
 import { Welcome } from '@/components/Welcome'
 import { initMonaco, isUseInIframe } from '@/lib/dom'
 import { Button } from '@/components/ui/button'
-import { useContainer } from './hooks/useContainer'
+import { useContainer } from '@/hooks/useContainer'
+import { PanelGroup } from '@/components/PanelGroup'
+import { RepoInfo } from '@/components/RepoInfo'
 
 function App() {
   const status = useAtomValue(serviceStatusAtom)
@@ -73,9 +75,23 @@ function App() {
           minSize={10}
           collapsible
         >
-          <div className="flex h-full items-center justify-center p-2">
-            <FileTree onSelect={setCurrentFile} />
-          </div>
+          <PanelGroup
+            panels={[
+              {
+                id: 'repo-info',
+                title: '仓库信息',
+                content: <RepoInfo />,
+                defaultOpen: true,
+              },
+              {
+                id: 'file-tree',
+                title: '文件',
+                content: <FileTree onSelect={setCurrentFile} />,
+                defaultOpen: true,
+              },
+            ]}
+            className="w-full h-full"
+          />
         </ResizablePanel>
         <ResizableHandle />
         {/* mainPanel */}

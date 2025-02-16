@@ -15,13 +15,6 @@ export interface RepositoryAdapter {
   }>
 
   /**
-   * 获取仓库的完整URL地址
-   * @param owner - 仓库所有者
-   * @param repo - 仓库名称
-   */
-  getRepositoryUrl(owner: string, repo: string): Promise<string>
-
-  /**
    * 获取仓库所有者的详细信息
    * @param owner - 仓库所有者用户名
    */
@@ -35,5 +28,21 @@ export interface RepositoryAdapter {
     blog?: string // 博客地址（可选）
     followers: number // 关注者数量
     following: number // 关注数量
+  }>
+
+  /**
+   * 获取仓库的统计信息
+   * @param owner - 仓库所有者
+   * @param repo - 仓库名称
+   */
+  getRepositoryStats(
+    owner: string,
+    repo: string,
+  ): Promise<{
+    stars: number // star数量
+    forks: number // fork数量
+    watchers: number // watch数量
+    description: string // 仓库描述
+    url: string // 仓库地址
   }>
 }

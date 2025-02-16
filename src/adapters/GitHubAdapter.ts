@@ -154,20 +154,6 @@ export class GitHubAdapter implements RepositoryAdapter {
   }
 
   /**
-   * 获取仓库地址
-   * @param owner 作者
-   * @param repo 仓库名称
-   * @returns
-   */
-  async getRepositoryUrl(owner: string, repo: string): Promise<string> {
-    const response = await this.octokit.repos.get({
-      owner,
-      repo,
-    })
-    return response.data.html_url
-  }
-
-  /**
    * 获取作者信息
    * @param owner 作者
    * @returns
@@ -197,6 +183,36 @@ export class GitHubAdapter implements RepositoryAdapter {
       blog: response.data.blog ?? undefined,
       followers: response.data.followers,
       following: response.data.following,
+    }
+  }
+
+  /**
+   * 获取仓库信息
+   * @param owner 作者
+   * @param repo 仓库名称
+   * @returns
+   */
+  async getRepositoryStats(
+    owner: string,
+    repo: string,
+  ): Promise<{
+    stars: number
+    forks: number
+    watchers: number
+    description: string
+    url: string
+  }> {
+    const response = await this.octokit.repos.get({
+      owner,
+      repo,
+    })
+
+    return {
+      stars: response.data.stargazers_count,
+      forks: response.data.forks_count,
+      watchers: response.data.watchers_count,
+      description: response.data.description || '',
+      url: response.data.html_url,
     }
   }
 }

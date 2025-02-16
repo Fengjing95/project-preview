@@ -49,6 +49,6 @@ export const repoInfoAtom = atomWithCache(async (get) => {
 
   if (!adaptor || !owner || !repo) return
   const ownerInfo = await adaptor.getOwnerInfo(owner)
-  const repoUrl = await adaptor.getRepositoryUrl(owner, repo)
-  return { ownerInfo, repoUrl }
+  const repoInfo = await adaptor.getRepositoryStats(owner, repo)
+  return { ownerInfo, repoUrl: repoInfo.url }
 })

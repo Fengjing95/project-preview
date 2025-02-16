@@ -1,7 +1,5 @@
 import { baseInfoAtom, repoInfoAtom } from '@/store/repo'
 import { useAtom, useAtomValue } from 'jotai'
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
-import { Skeleton } from '@/components/ui/skeleton'
 import { leftPanelOpenAtom, bottomPanelOpenAtom, previewPanelOpenAtom } from '@/store/global'
 import { useKeyPress } from 'ahooks'
 import { KEY_MAP } from '@/constants/keyboard'
@@ -42,29 +40,9 @@ export function Header() {
 
   return (
     <div className="h-full flex items-center select-none px-4 border-b">
-      {/* owner信息 */}
       <div className="flex-1 flex gap-2 items-center">
-        <a
-          className="cursor-pointer flex gap-2"
-          href={repoInfo?.ownerInfo?.htmlUrl}
-          target="_blank"
-          title="前往主页"
-        >
-          {repoInfo?.ownerInfo?.name ? (
-            <Avatar className="w-6 h-6">
-              <AvatarImage src={repoInfo.ownerInfo.avatar} alt={repoInfo.ownerInfo.name} />
-              <AvatarFallback>{repoInfo.ownerInfo.name.slice(0, 2)}</AvatarFallback>
-            </Avatar>
-          ) : (
-            <Skeleton className="w-6 h-6 rounded-full border" />
-          )}
-
-          {repoInfo?.ownerInfo?.name ? (
-            <span className="text-secondary-foreground">{repoInfo?.ownerInfo.name}</span>
-          ) : (
-            <Skeleton className="w-24 h-6" />
-          )}
-        </a>
+        <img className="size-8" src="/public/images/logo.png" />
+        <div>Project Preview</div>
         <ShareToggle />
       </div>
 
