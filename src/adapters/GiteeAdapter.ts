@@ -182,7 +182,6 @@ export class GiteeAdapter implements RepositoryAdapter {
 
   async fetchRepository(owner: string, repo: string, branch?: string) {
     const files = await this.fetchDirectory(owner, repo, '', branch)
-    console.log('files', files)
     const fileSystem = this.convertToWebContainerFormat(files)
     return { files, fileSystem }
   }
