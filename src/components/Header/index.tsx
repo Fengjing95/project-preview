@@ -41,7 +41,7 @@ export function Header() {
   return (
     <div className="h-full flex items-center select-none px-4 border-b">
       <div className="flex-1 flex gap-2 items-center">
-        <img className="size-8" src="/public/images/logo.png" />
+        <img className="size-8" src="/images/logo.png" />
         <div>Project Preview</div>
         <ShareToggle />
       </div>

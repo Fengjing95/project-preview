@@ -72,9 +72,7 @@ export function RepoInfo() {
           <Skeleton className="h-8 w-48" />
         )}
         {/* 仓库描述 */}
-        {stats?.description && (
-          <p className="text-sm text-muted-foreground">12333{stats.description}</p>
-        )}
+        {stats?.description && <p className="text-sm text-muted-foreground">{stats.description}</p>}
       </div>
 
       {/* 仓库统计 */}
