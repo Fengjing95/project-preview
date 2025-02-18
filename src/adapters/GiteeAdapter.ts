@@ -22,13 +22,17 @@ export class GiteeAdapter implements RepositoryAdapter {
    * @param endpoint - API端点
    * @returns Promise<Response>
    */
-  private async request(endpoint: string) {
-    const url = `${this.baseUrl}${endpoint}`
+  private async request<T = any>(endpoint: string): Promise<T> {
+    let url = `${this.baseUrl}${endpoint}`
     const headers: Record<string, string> = {
       Accept: 'application/json',
     }
     if (this.token) {
-      headers['Authorization'] = `token ${this.token}`
+      if (url.includes('?')) {
+        url += `&access_token=${this.token}`
+      } else {
+        url += `?access_token=${this.token}`
+      }
     }
     const response = await fetch(url, { headers })
     if (!response.ok) {
@@ -42,34 +46,44 @@ export class GiteeAdapter implements RepositoryAdapter {
    * @param owner - 仓库所有者
    * @param repo - 仓库名称
    * @param path - 文件路径
+   * @params sha - 文件的SHA值
    * @returns 包含文件信息的对象
    */
   private async fetchFile(
     owner: string,
     repo: string,
     path: string,
-    ref?: string,
+    sha: string,
   ): Promise<{ path: string; type: 'file'; content: string }> {
-    const endpoint = `/repos/${owner}/${repo}/contents/${path}${ref ? `?ref=${ref}` : ''}`
-    const response = await this.request(endpoint)
+    const endpoint = `/repos/${owner}/${repo}/git/blobs/${sha}`
+    const response = await this.request<{
+      sha: string
+      size: number
+      url: string
+      content: string
+      encoding: string
+    }>(endpoint)
 
-    if (Array.isArray(response)) {
-      throw new Error('Expected a file but received a directory')
+    if (!response.sha) {
+      throw new Error('Failed to get file blob')
     }
 
     return {
       path: path,
       type: 'file',
-      content: atob(response.content || ''),
+      content: new TextDecoder().decode(
+        Uint8Array.from(atob(response.content || ''), (c) => c.charCodeAt(0)),
+      ),
     }
   }
 
   /**
-   * 获取目录中的所有文件和子目录
-   * @param owner - 仓库所有者
+   * 获取目录下的文件列表
+   * @param owner - 作者
    * @param repo - 仓库名称
-   * @param path - 目录路径
-   * @returns 包含文件和目录信息的数组
+   * @param path - 路径
+   * @param ref - 分支
+   * @returns
    */
   private async fetchDirectory(
     owner: string,
@@ -77,30 +91,43 @@ export class GiteeAdapter implements RepositoryAdapter {
     path: string,
     ref?: string,
   ): Promise<Array<{ path: string; type: 'file' | 'directory'; content: string }>> {
-    const endpoint = `/repos/${owner}/${repo}/contents/${path}${ref ? `?ref=${ref}` : ''}`
-    const response = await this.request(endpoint)
+    const treeEndpoint = `/repos/${owner}/${repo}/git/trees/${ref || 'master'}?recursive=1`
+    const response = await this.request<{
+      sha: string
+      url: string
+      tree: Array<{
+        path: string
+        mode: string
+        type: 'tree' | 'blob'
+        sha: string
+        size: number
+        url: string
+      }>
+      truncated: boolean
+    }>(treeEndpoint)
 
-    if (!Array.isArray(response)) {
-      throw new Error('Expected a directory but received a file')
+    if (!response.tree) {
+      throw new Error('Failed to get repository tree')
     }
 
     const results = await Promise.all(
-      response.map(async (item) => {
-        if (item.type === 'dir') {
-          const subFiles = await this.fetchDirectory(owner, repo, item.path, ref)
-          return [
-            {
-              path: item.path,
-              type: 'directory' as const,
-              content: '',
-            },
-            ...subFiles,
-          ]
-        } else {
-          const file = await this.fetchFile(owner, repo, item.path, ref)
-          return [file]
-        }
-      }),
+      response.tree
+        .filter((item) => !path || item.path.startsWith(path))
+        .map(async (item) => {
+          if (item.type === 'tree') {
+            return [
+              {
+                path: item.path,
+                type: 'directory' as const,
+                content: '',
+              },
+            ]
+          } else if (item.type === 'blob') {
+            const file = await this.fetchFile(owner, repo, item.path, item.sha)
+            return file
+          }
+          return []
+        }),
     )
     return results.flat()
   }
@@ -155,6 +182,7 @@ export class GiteeAdapter implements RepositoryAdapter {
 
   async fetchRepository(owner: string, repo: string, branch?: string) {
     const files = await this.fetchDirectory(owner, repo, '', branch)
+    console.log('files', files)
     const fileSystem = this.convertToWebContainerFormat(files)
     return { files, fileSystem }
   }
