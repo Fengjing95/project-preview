@@ -1,8 +1,9 @@
 import { getAdapter } from '@/adapters'
 import { RepositoryAdapter } from '@/adapters/RepositoryAdapter'
 import { getSearchParams } from '@/lib/params'
-import { atom } from 'jotai'
+import { atom, getDefaultStore } from 'jotai'
 import { atomWithCache } from 'jotai-cache'
+import { errorAtom } from './global'
 
 // owner
 export const ownerAtom = atom(getSearchParams('owner'))
@@ -42,7 +43,12 @@ export const gitInfoAtom = atomWithCache(async (get) => {
   const { owner, repo } = get(baseInfoAtom)
 
   if (!adaptor || !owner || !repo) return
-  const ownerInfo = await adaptor.getOwnerInfo(owner)
-  const repoInfo = await adaptor.getRepositoryStats(owner, repo)
-  return { ownerInfo, repoInfo }
+  try {
+    const ownerInfo = await adaptor.getOwnerInfo(owner)
+    const repoInfo = await adaptor.getRepositoryStats(owner, repo)
+    return { ownerInfo, repoInfo }
+  } catch (error) {
+    const store = getDefaultStore()
+    store.set(errorAtom, error as Error)
+  }
 })

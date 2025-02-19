@@ -43,7 +43,7 @@ export const LANGUAGE_MAP = {
   rs: 'rust',
   php: 'php',
   rb: 'ruby',
-  vue: 'vue',
+  vue: 'html',
   yaml: 'yaml',
   yml: 'yaml',
   xml: 'xml',

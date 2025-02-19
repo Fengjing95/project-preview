@@ -10,6 +10,7 @@ import {
   Welcome,
   PanelGroup,
   RepoInfo,
+  ErrorDialog,
 } from '@/components'
 import { ServiceStatus } from '@/constants/serviceStatus'
 import { Toaster } from '@/components/ui/sonner'
@@ -151,6 +152,7 @@ function App() {
         </ResizablePanel>
       </ResizablePanelGroup>
       <Toaster />
+      <ErrorDialog />
     </div>
   )
 }

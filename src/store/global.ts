@@ -46,3 +46,6 @@ export const serviceStatusAtom = atom<ServiceStatus>(ServiceStatus.INIT)
 
 // webContainer info
 export const serverInfoAtom = atom<IServerInfo>({})
+
+// 全局错误
+export const errorAtom = atom<Error | null>(null)

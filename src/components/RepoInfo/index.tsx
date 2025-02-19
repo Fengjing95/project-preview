@@ -1,8 +1,9 @@
+import { Suspense } from 'react'
 import { useAtomValue } from 'jotai'
 import { baseInfoAtom, gitInfoAtom } from '@/store/repo'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Skeleton } from '@/components/ui/skeleton'
-import { VscGithubInverted, VscRepoForked, VscEye } from 'react-icons/vsc'
+import { VscRepoForked, VscEye } from 'react-icons/vsc'
 import { AiFillStar } from 'react-icons/ai'
 import { useEffect, useState } from 'react'
 
@@ -13,7 +14,7 @@ interface RepoStats {
   description: string
 }
 
-export function RepoInfo() {
+function RepoInfoContent() {
   const gitInfo = useAtomValue(gitInfoAtom)
   const { owner, repo, repository } = useAtomValue(baseInfoAtom)
   const [stats, setStats] = useState<RepoStats | null>(null)
@@ -69,36 +70,54 @@ export function RepoInfo() {
             {repo}
           </div>
         ) : (
-          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-6 w-88" />
         )}
         {/* 仓库描述 */}
         {stats?.description && <p className="text-sm text-muted-foreground">{stats.description}</p>}
       </div>
 
       {/* 仓库统计 */}
-      <div className="flex items-center gap-4">
-        {stats ? (
-          <>
-            <div className="flex items-center gap-2">
-              <AiFillStar className="text-xl" />
-              <span>{stats.stars}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <VscRepoForked className="text-xl" />
-              <span>{stats.forks}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <VscEye className="text-xl" />
-              <span>{stats.watchers}</span>
-            </div>
-          </>
-        ) : (
+      {stats ? (
+        <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <VscGithubInverted className="text-xl" />
-            <span>加载中...</span>
+            <AiFillStar className="text-xl" />
+            <span>{stats?.stars}</span>
           </div>
-        )}
-      </div>
+          <div className="flex items-center gap-2">
+            <VscRepoForked className="text-xl" />
+            <span>{stats?.forks}</span>
+          </div>
+          <div className="flex items-center gap-2">
+            <VscEye className="text-xl" />
+            <span>{stats?.watchers}</span>
+          </div>
+        </div>
+      ) : (
+        <Skeleton className="h-6 w-88" />
+      )}
     </div>
+  )
+}
+
+export function RepoInfo() {
+  return (
+    <Suspense
+      fallback={
+        <div className="p-4">
+          <div className="flex items-center gap-2 mb-2">
+            <Skeleton className="w-10 h-10 rounded-full" />
+            <div className="flex-1 space-y-2">
+              <Skeleton className="h-6 w-32" />
+              <Skeleton className="h-4 w-48" />
+            </div>
+          </div>
+          <div className="mb-2">
+            <Skeleton className="h-6 w-88" />
+          </div>
+        </div>
+      }
+    >
+      <RepoInfoContent />
+    </Suspense>
   )
 }
