@@ -25,9 +25,6 @@ export interface RepositoryAdapter {
     bio: string // 个人简介
     company?: string // 所属公司（可选）
     location?: string // 所在地（可选）
-    blog?: string // 博客地址（可选）
-    followers: number // 关注者数量
-    following: number // 关注数量
   }>
 
   /**
@@ -44,5 +41,6 @@ export interface RepositoryAdapter {
     watchers: number // watch数量
     description: string // 仓库描述
     url: string // 仓库地址
+    name: string // 仓库名称
   }>
 }

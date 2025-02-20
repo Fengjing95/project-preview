@@ -1,10 +1,12 @@
 import { GiteeAdapter } from './GiteeAdapter'
 import { GitHubAdapter } from './GitHubAdapter'
+import { GitLabAdapter } from './GitLabAdapter'
 import { RepositoryAdapter } from './RepositoryAdapter'
 
 const adapterMap: Record<string, new (token: string) => RepositoryAdapter> = {
   github: GitHubAdapter,
   gitee: GiteeAdapter,
+  gitlab: GitLabAdapter,
 }
 
 /**

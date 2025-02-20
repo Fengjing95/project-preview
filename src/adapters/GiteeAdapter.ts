@@ -210,9 +210,6 @@ export class GiteeAdapter implements RepositoryAdapter {
     bio: string
     company?: string
     location?: string
-    blog?: string
-    followers: number
-    following: number
   }> {
     const endpoint = `/users/${owner}`
     const response = await this.request(endpoint)
@@ -224,9 +221,6 @@ export class GiteeAdapter implements RepositoryAdapter {
       bio: response.bio || '',
       company: response.company ?? undefined,
       location: response.location ?? undefined,
-      blog: response.blog ?? undefined,
-      followers: response.followers,
-      following: response.following,
     }
   }
 
@@ -245,6 +239,7 @@ export class GiteeAdapter implements RepositoryAdapter {
     watchers: number
     description: string
     url: string
+    name: string
   }> {
     const endpoint = `/repos/${owner}/${repo}`
     const response = await this.request(endpoint)
@@ -255,6 +250,7 @@ export class GiteeAdapter implements RepositoryAdapter {
       watchers: response.watchers_count,
       description: response.description || '',
       url: response.html_url,
+      name: response.name,
     }
   }
 }

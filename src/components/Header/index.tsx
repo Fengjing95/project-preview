@@ -67,7 +67,7 @@ export function Header() {
             'flex-1',
           )}
         >
-          {owner}/{repo}
+          {gitInfo?.ownerInfo.name || owner}/{gitInfo?.repoInfo.name || repo}
         </a>
       </div>
 

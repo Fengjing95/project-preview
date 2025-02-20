@@ -31,10 +31,10 @@ export function ErrorDialog({ error }: ErrorDialogProps) {
         </DialogHeader>
 
         {displayErr && (
-          <div className="bg-muted p-4 rounded-md">
+          <div className="bg-muted p-4 rounded-md overflow-y-auto">
             <p className="font-mono text-sm">{displayErr.message}</p>
             {displayErr.stack && (
-              <pre className="mt-2 text-xs overflow-auto max-h-[200px] text-wrap">
+              <pre className="mt-2 text-xs overflow-auto max-h-[200px] whitespace-pre">
                 {displayErr.stack}
               </pre>
             )}
