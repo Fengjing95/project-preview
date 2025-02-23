@@ -102,8 +102,10 @@ export function useContainer(props: IProps) {
    * 核心初始化流程
    */
   async function coreInit() {
+    setServiceStatus(ServiceStatus.INIT)
     try {
       switch (serviceStatus) {
+        case ServiceStatus.NULL:
         case ServiceStatus.INIT:
           await initContainer()
           await mountFileSystem()

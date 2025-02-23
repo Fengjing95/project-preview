@@ -1,6 +1,7 @@
 import { atom } from 'jotai'
 import { ServiceStatus } from '@/constants/serviceStatus'
 import { IServerInfo } from '@/typings/server'
+import { isUseInIframe } from '@/lib/dom'
 
 // 左侧面板宽度
 export const leftPanelAtom = atom(25)
@@ -42,7 +43,9 @@ export const resolveBottomPanelAtom = atom((get) => {
 export const previewPanelOpenAtom = atom(true)
 
 // 服务启动状态
-export const serviceStatusAtom = atom<ServiceStatus>(ServiceStatus.INIT)
+export const serviceStatusAtom = atom<ServiceStatus>(
+  isUseInIframe() ? ServiceStatus.NULL : ServiceStatus.INIT,
+)
 
 // webContainer info
 export const serverInfoAtom = atom<IServerInfo>({})

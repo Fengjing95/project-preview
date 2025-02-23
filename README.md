@@ -4,7 +4,7 @@
 
 ### 计划
 
-- [x] github仓库代码拉取
+- [x] github、gitee、gitlab仓库代码拉取
 - [x] WebContainer 文件系统挂载、安装依赖、启动server，监听目录变化同步文件更新
 - [x] 项目目录文件树展示
 - [x] monaco-editor 代码接入， 支持浏览、编辑、保存（当前会话期内生效）代码
@@ -15,10 +15,10 @@
 - [ ] 目录树右键菜单支持新建、删除、重命名文件/文件夹
 - [ ] 编辑器支持多开，双击打开时可保留当前编辑器，单击打开未编辑不保留
 - [x] 多终端支持
-- [ ] Share Page: url & iframe
+- [x] Share Page: url & iframe(iframe需要引用网站也开启COOP & COEP)
 
 
 ### ToFix
 
 - [x] 主题切换时改变xterm背景色
-- [ ] shadcn/ui css变失效，可能与tailwindcss v4有关
+- [x] shadcn/ui css变失效，可能与tailwindcss v4有关

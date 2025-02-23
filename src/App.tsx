@@ -13,6 +13,7 @@ import {
   ErrorDialog,
 } from '@/components'
 import { ServiceStatus } from '@/constants/serviceStatus'
+import { LoadingDialog } from '@/components/LoadingDialog'
 import { Toaster } from '@/components/ui/sonner'
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable'
 import { useAtomValue } from 'jotai'
@@ -54,12 +55,14 @@ function App() {
 
   return (
     <div className="w-full h-[100vh] flex flex-col border overflow-hidden">
-      {status === ServiceStatus.INIT && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      {status === ServiceStatus.NULL ? (
+        <div className="fixed inset-0 z-50 bg-background/80 backdrop-blur-sm flex items-center justify-center">
           <Button size="lg" onClick={coreInit}>
             预览
           </Button>
         </div>
+      ) : (
+        <LoadingDialog />
       )}
       {/* headerPanel */}
       <div className="h-10">

@@ -1,6 +1,7 @@
 // 服务状态
 export enum ServiceStatus {
-  INIT, // 初始
+  NULL, // 空状态
+  INIT, // 初始化
   CREATE_INSTANCE, // 创建container实例
   PULLED, // 拉取文件
   MOUNT_FS, // 挂载文件
@@ -11,11 +12,12 @@ export enum ServiceStatus {
 
 // 状态的先后顺序
 export const ServiceStatusMap = {
-  [ServiceStatus.INIT]: 0,
+  [ServiceStatus.NULL]: 0,
+  [ServiceStatus.INIT]: 1,
   [ServiceStatus.CREATE_INSTANCE]: 2,
-  [ServiceStatus.PULLED]: 1,
-  [ServiceStatus.MOUNT_FS]: 3,
-  [ServiceStatus.INSTALLED_DEPENDENCY]: 4,
-  [ServiceStatus.STARTING_SERVER]: 5,
-  [ServiceStatus.RUNNING]: 6,
+  [ServiceStatus.PULLED]: 3,
+  [ServiceStatus.MOUNT_FS]: 4,
+  [ServiceStatus.INSTALLED_DEPENDENCY]: 5,
+  [ServiceStatus.STARTING_SERVER]: 6,
+  [ServiceStatus.RUNNING]: 7,
 }
