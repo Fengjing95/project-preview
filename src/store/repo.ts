@@ -1,9 +1,9 @@
-import { getAdapter } from '@/adapters'
 import { RepositoryAdapter } from '@/adapters/RepositoryAdapter'
 import { getSearchParams } from '@/lib/params'
 import { atom, getDefaultStore } from 'jotai'
 import { atomWithCache } from 'jotai-cache'
 import { errorAtom } from './global'
+import { loadable } from 'jotai/utils'
 
 // owner
 export const ownerAtom = atom(getSearchParams('owner'))
@@ -21,10 +21,7 @@ export const tokenAtom = atom(getSearchParams('token'))
 export const gitTypeAtom = atom(getSearchParams('source') as string)
 
 // 仓库适配器实例
-export const repositoryAtom = atom<RepositoryAdapter | null>((get) => {
-  const Constructor = getAdapter(get(gitTypeAtom))
-  return new Constructor(get(tokenAtom) as string)
-})
+export const repositoryAtom = atom<RepositoryAdapter | null>(null)
 
 // baseInfo
 export const baseInfoAtom = atom((get) => {
@@ -33,12 +30,12 @@ export const baseInfoAtom = atom((get) => {
     repo: get(repoAtom),
     branch: get(branchAtom),
     token: get(tokenAtom),
-    repository: get(repositoryAtom),
+    gitType: get(gitTypeAtom),
   }
 })
 
 // 仓库信息
-export const gitInfoAtom = atomWithCache(async (get) => {
+const gitInfoAtomBase = atomWithCache(async (get) => {
   const adaptor = get(repositoryAtom)
   const { owner, repo } = get(baseInfoAtom)
 
@@ -46,9 +43,12 @@ export const gitInfoAtom = atomWithCache(async (get) => {
   try {
     const ownerInfo = await adaptor.getOwnerInfo(owner)
     const repoInfo = await adaptor.getRepositoryStats(owner, repo)
-    return { ownerInfo, repoInfo }
+    const stats = await adaptor.getRepositoryStats(owner, repo)
+    return { ownerInfo, repoInfo, stats }
   } catch (error) {
     const store = getDefaultStore()
     store.set(errorAtom, error as Error)
   }
 })
+
+export const gitInfoAtom = loadable(gitInfoAtomBase)

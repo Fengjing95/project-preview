@@ -2,12 +2,14 @@ import { IPreviewRef } from '@/components'
 import { ServiceStatus } from '@/constants/serviceStatus'
 import { WebContainerService } from '@/services/WebContainerService'
 import { serverInfoAtom, serviceStatusAtom } from '@/store/global'
-import { baseInfoAtom } from '@/store/repo'
+import { baseInfoAtom, repositoryAtom } from '@/store/repo'
 import { removeTerminalAtom } from '@/store/terminal'
 import { parseLocalUrl } from '@/lib/dom'
 import { emitEvent, EventName } from '@/lib/evenemitter'
-import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import { getDefaultStore, useAtom, useAtomValue, useSetAtom } from 'jotai'
 import { toast } from 'sonner'
+import { useEffect } from 'react'
+import { getAdapter } from '@/adapters'
 
 interface IProps {
   portRef: React.MutableRefObject<number | undefined>
@@ -18,8 +20,17 @@ export function useContainer(props: IProps) {
   const { portRef, previewRef } = props
   const [serviceStatus, setServiceStatus] = useAtom(serviceStatusAtom)
   const setServerInfo = useSetAtom(serverInfoAtom)
-  const { owner, repo, branch, repository } = useAtomValue(baseInfoAtom)
+  const { token, gitType } = useAtomValue(baseInfoAtom)
   const removeTerminal = useSetAtom(removeTerminalAtom)
+  const [repository, setRepository] = useAtom(repositoryAtom)
+
+  useEffect(() => {
+    if (token && gitType && !repository) {
+      const Constructor = getAdapter(gitType)
+      const repositoryInstance = new Constructor(token as string)
+      setRepository(repositoryInstance)
+    }
+  }, [token, gitType])
 
   // 初始化 WebContainer 服务
   async function initContainer() {
@@ -61,6 +72,10 @@ export function useContainer(props: IProps) {
 
   // 下载文件并挂载
   async function mountFileSystem() {
+    const store = getDefaultStore()
+    const { owner, repo, branch } = store.get(baseInfoAtom)
+    const repository = store.get(repositoryAtom)
+
     if (!owner || !repo || !repository) {
       throw new Error('仓库信息缺失，无法拉取代码')
     }

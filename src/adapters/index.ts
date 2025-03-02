@@ -3,10 +3,16 @@ import { GitHubAdapter } from './GitHubAdapter'
 import { GitLabAdapter } from './GitLabAdapter'
 import { RepositoryAdapter } from './RepositoryAdapter'
 
+export enum RepositoryAdapterEnum {
+  GITHUB = 'github',
+  GITEE = 'gitee',
+  GITLAB = 'gitlab',
+}
+
 const adapterMap: Record<string, new (token: string) => RepositoryAdapter> = {
-  github: GitHubAdapter,
-  gitee: GiteeAdapter,
-  gitlab: GitLabAdapter,
+  [RepositoryAdapterEnum.GITHUB]: GitHubAdapter,
+  [RepositoryAdapterEnum.GITEE]: GiteeAdapter,
+  [RepositoryAdapterEnum.GITLAB]: GitLabAdapter,
 }
 
 /**

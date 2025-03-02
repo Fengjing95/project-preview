@@ -1,6 +1,11 @@
 import { baseInfoAtom, gitInfoAtom } from '@/store/repo'
-import { useAtom, useAtomValue } from 'jotai'
-import { leftPanelOpenAtom, bottomPanelOpenAtom, previewPanelOpenAtom } from '@/store/global'
+import { useAtom, useAtomValue, useSetAtom } from 'jotai'
+import {
+  leftPanelOpenAtom,
+  bottomPanelOpenAtom,
+  previewPanelOpenAtom,
+  errorAtom,
+} from '@/store/global'
 import { useKeyPress } from 'ahooks'
 import { KEY_MAP } from '@/constants/keyboard'
 import {
@@ -20,15 +25,23 @@ import { StartToggle } from './StartToggle'
 import { cn } from '@/lib/utils'
 import { MyTooltip } from '@/components'
 import { Button } from '@/components/ui/button'
+import { Skeleton } from '@/components/ui/skeleton'
 
 const isInIframe = isUseInIframe()
 
+const LoadingHeader = () => (
+  <div className="h-full flex items-center select-none px-4 border-b">
+    <Skeleton className="w-full h-8" />
+  </div>
+)
+
 export function Header() {
-  const gitInfo = useAtomValue(gitInfoAtom)
+  const [gitInfoAsync] = useAtom(gitInfoAtom)
   const { owner, repo } = useAtomValue(baseInfoAtom)
   const [leftPanelOpen, setLeftPanelOpen] = useAtom(leftPanelOpenAtom)
   const [bottomPanelOpen, setBottomPanelOpen] = useAtom(bottomPanelOpenAtom)
   const [previewPanelOpen, setPreviewPanelOpen] = useAtom(previewPanelOpenAtom) // 预览面板
+  const setGlobalError = useSetAtom(errorAtom)
 
   useKeyPress(KEY_MAP.fileTree.key, () => {
     setLeftPanelOpen(!leftPanelOpen)
@@ -37,6 +50,17 @@ export function Header() {
   useKeyPress(KEY_MAP.terminal.key, () => {
     setBottomPanelOpen(!bottomPanelOpen)
   })
+
+  if (gitInfoAsync.state === 'loading') {
+    return <LoadingHeader />
+  }
+
+  if (gitInfoAsync.state === 'hasError') {
+    setGlobalError(gitInfoAsync.error as Error)
+    return <LoadingHeader />
+  }
+
+  const gitInfo = gitInfoAsync.data
 
   return (
     <div className="h-full flex items-center select-none px-4 border-b">
