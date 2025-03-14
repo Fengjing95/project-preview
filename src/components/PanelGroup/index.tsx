@@ -8,6 +8,8 @@ export interface PanelItem {
   title: string
   content: ReactNode
   defaultOpen?: boolean
+  className?: string
+  containerClassName?: string
 }
 
 export interface PanelGroupProps {
@@ -30,6 +32,7 @@ export function PanelGroup({ panels, className }: PanelGroupProps) {
     <div className={cn('h-full flex flex-col overflow-hidden', className)}>
       {panels.map((panel) => (
         <Collapsible
+          className={cn('flex', 'flex-col', panel.containerClassName)}
           key={panel.id}
           open={openStates[panel.id]}
           onOpenChange={(open) => setOpenStates((prev) => ({ ...prev, [panel.id]: open }))}
@@ -46,7 +49,7 @@ export function PanelGroup({ panels, className }: PanelGroupProps) {
             </div>
           </CollapsibleTrigger>
           <CollapsibleContent
-            className="overflow-auto px-2"
+            className={cn('overflow-auto', 'px-2', panel.className)}
             forceMount
             hidden={!openStates[panel.id]}
           >

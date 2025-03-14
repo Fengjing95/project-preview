@@ -101,6 +101,8 @@ function App() {
                     title: '文件',
                     content: <FileTree onSelect={setCurrentFile} />,
                     defaultOpen: true,
+                    containerClassName: 'flex-1 min-h-0',
+                    className: 'flex-1 min-h-0 overflow-auto -mr-2',
                   },
                 ]}
                 className="w-full h-full"
