@@ -9,7 +9,7 @@ export function MyTooltip(props: PropsWithChildren<IProps>) {
   return (
     <Tooltip>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
-      <TooltipContent>{message}</TooltipContent>
+      <TooltipContent side="bottom">{message}</TooltipContent>
     </Tooltip>
   )
 }

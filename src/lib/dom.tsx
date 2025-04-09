@@ -1,5 +1,4 @@
 import { IServerInfo } from '@/typings/server'
-import { loader } from '@monaco-editor/react'
 
 /**
  * 根据类名获取属性值
@@ -41,22 +40,6 @@ export const splitAndRenderCode = (text: string, separator: string = ',') => {
       {part.trim()}
     </code>
   ))
-}
-
-/**
- * 初始化monaco
- */
-export async function initMonaco() {
-  const monaco = await loader.init()
-
-  monaco.editor.defineTheme('dark', {
-    base: 'vs-dark',
-    inherit: true,
-    rules: [],
-    colors: {
-      'editor.background': '#020817',
-    },
-  })
 }
 
 /**

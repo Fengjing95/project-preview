@@ -1,33 +1,44 @@
-import { useCallback, useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import MonacoEditor, { OnMount } from '@monaco-editor/react'
 import { WebContainerService } from '@/services/WebContainerService'
-import { getFileLang } from '@/lib/getFileLang'
+import { getFileLang, getFileNameFromPath } from '@/lib/getFileLang'
 import { useKeyPress, usePrevious } from 'ahooks'
 import { KEY_MAP } from '@/constants/keyboard'
 import { useTheme } from '@/components/ThemeProvider'
-import { useAtom } from 'jotai'
-import { EditorModel, editorModelsAtom } from '@/store/editor'
-import { editor } from 'monaco-editor'
+import { useAtom, useAtomValue } from 'jotai'
+import {
+  IEditorModel,
+  editorModelsAtom,
+  ICodeEditorViewState,
+  ITextModel,
+  currentActiveEditorAtom,
+} from '@/store/editor'
+import { editor } from '@/lib/editor'
+import { TabItem } from './TabItem'
 
-interface EditorProps {
-  filePath: string
-  defaultValue?: string
-  language?: string
-  onChange?: (value: string) => void
-}
-
-export const Editor: React.FC<EditorProps> = ({ filePath, onChange }) => {
+export const Editor = () => {
   const [editorInstance, setEditorInstance] = useState<Parameters<OnMount>[0] | null>(null)
   const { theme } = useTheme()
   const [modelMap, setModelMap] = useAtom(editorModelsAtom) // 编辑器模型
+  const filePath = useAtomValue(currentActiveEditorAtom)
   const prevFilePath = usePrevious(filePath) // 生效中的文件路径
+  // 标签页
+  const tabs = useMemo(() => {
+    const entries = Array.from(modelMap.entries())
+    return entries.map(([path, editorModel]) => ({
+      path,
+      name: getFileNameFromPath(path),
+      ...editorModel,
+    }))
+  }, [modelMap])
 
-  const loadFileContent = useCallback(async () => {
+  // 加载文件内容
+  const loadFileContent = async () => {
     if (!editorInstance) return
 
     if (modelMap.has(filePath)) {
       // 如果已经存在模型，则直接使用
-      const { model, state } = modelMap.get(filePath) as EditorModel
+      const { model, state } = modelMap.get(filePath) as IEditorModel
       editorInstance.setModel(model) // 设置模型
       editorInstance.restoreViewState(state) // 恢复视图状态
     } else {
@@ -43,23 +54,29 @@ export const Editor: React.FC<EditorProps> = ({ filePath, onChange }) => {
 
         const model = editor.createModel(content, language) // 创建模型
         editorInstance.setModel(model)
+
+        const state = editorInstance.saveViewState() as ICodeEditorViewState // 保存视图状态
+        modelMap.set(filePath, { model, state, isChanged: false }) // 保存模型
+        setModelMap(new Map(modelMap)) // 保存模型映射
       } catch (error) {
         console.error('Failed to read file:', error)
       }
     }
     editorInstance.focus() // 聚焦
-  }, [modelMap, filePath, editorInstance])
+  }
 
   // 保存编辑器状态
-  const saveEditor = useCallback(() => {
+  const saveEditor = () => {
     if (prevFilePath && editorInstance) {
-      const state = editorInstance.saveViewState() as editor.ICodeEditorViewState // 保存视图状态
-      const model = editorInstance.getModel() as editor.ITextModel // 获取模型
-      modelMap.set(prevFilePath, { model, state }) // 保存模型
+      const state = editorInstance.saveViewState() as ICodeEditorViewState // 保存视图状态
+      const model = editorInstance.getModel() as ITextModel // 获取模型
+      const isChanged = modelMap.get(prevFilePath)?.isChanged || false // 是否编辑
+      modelMap.set(prevFilePath, { model, state, isChanged }) // 保存模型
       setModelMap(new Map(modelMap)) // 保存模型映射
     }
-  }, [prevFilePath, modelMap, editorInstance])
+  }
 
+  // 切换文件时保存编辑器状态, 加载新文件内容
   useEffect(() => {
     saveEditor()
     loadFileContent()
@@ -72,6 +89,24 @@ export const Editor: React.FC<EditorProps> = ({ filePath, onChange }) => {
     })
   }, [theme])
 
+  /**
+   * 变更编辑器状态
+   * @param isChanged 是否编辑
+   */
+  const handleChangeEditorStatus = (isChanged: boolean) => {
+    if (!editorInstance) return
+
+    const editorModel = modelMap.get(filePath)
+    if (!editorModel || editorModel.isChanged) return
+
+    modelMap.set(filePath, {
+      ...editorModel,
+      isChanged,
+    })
+    setModelMap(new Map(modelMap))
+  }
+
+  // 保存编辑器内容
   const handleEditorSave = () => {
     const value = editorInstance?.getValue() || ''
 
@@ -83,7 +118,7 @@ export const Editor: React.FC<EditorProps> = ({ filePath, onChange }) => {
 
       try {
         await webcontainer.fs.writeFile(filePath, value)
-        onChange?.(value)
+        handleChangeEditorStatus(false)
       } catch (error) {
         console.error('Failed to save file:', error)
       }
@@ -96,10 +131,16 @@ export const Editor: React.FC<EditorProps> = ({ filePath, onChange }) => {
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
+      <div className="h-10 border-b flex overflow-x-auto">
+        {tabs.map((tab) => (
+          <TabItem key={tab.path} data={tab} />
+        ))}
+      </div>
       <MonacoEditor
         theme={theme}
         height="100%"
         onMount={setEditorInstance}
+        onChange={() => handleChangeEditorStatus(true)}
         options={{
           minimap: { enabled: true },
           fontSize: 14,

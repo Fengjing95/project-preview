@@ -20,3 +20,12 @@ export function getFileIcon(filename: string) {
   const ext = filename.split('.').pop()?.toLowerCase() as keyof typeof LANGUAGE_ICON
   return LANGUAGE_ICON[ext] || <BiCodeAlt />
 }
+
+/**
+ * 根据文件路径返回文件名
+ * @param path 文件路径
+ * @returns
+ */
+export function getFileNameFromPath(path: string) {
+  return path.split('/').pop() || ''
+}

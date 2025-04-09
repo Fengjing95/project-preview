@@ -3,10 +3,8 @@ import { WebContainerService } from '../../services/WebContainerService'
 import { bindEvent, EventName, removeEvent } from '@/lib/evenemitter'
 import { BiFolder, BiFolderOpen } from 'react-icons/bi'
 import { getFileIcon } from '@/lib/getFileLang'
-
-interface FileTreeProps {
-  onSelect?: (filePath: string) => void
-}
+import { useSetAtom } from 'jotai'
+import { currentActiveEditorAtom } from '@/store/editor'
 
 interface FileNode {
   name: string
@@ -15,9 +13,10 @@ interface FileNode {
   path: string
 }
 
-export const FileTree: React.FC<FileTreeProps> = ({ onSelect }) => {
+export const FileTree = () => {
   const [files, setFiles] = useState<FileNode[]>([])
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
+  const setCurrentActiveEditor = useSetAtom(currentActiveEditorAtom)
 
   function sortNodes(nodes: FileNode[]): FileNode[] {
     const directories = nodes
@@ -133,8 +132,20 @@ export const FileTree: React.FC<FileTreeProps> = ({ onSelect }) => {
             if (node.type === 'directory') {
               toggleDirectory(node.path)
             } else {
-              onSelect?.(node.path)
+              // TODO
+              // 已存在打开的编辑器切换
+              // 不存在打开的编辑器新增临时编辑器
+              setCurrentActiveEditor(node.path)
             }
+          }}
+          onDoubleClick={() => {
+            if (node.type === 'directory') {
+              return
+            }
+            // TODO
+            // 已存在打开的编辑器切换
+            // 不存在打开的编辑器新增固定编辑器
+            setCurrentActiveEditor(node.path)
           }}
         >
           <span className="mr-2">
