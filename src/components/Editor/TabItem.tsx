@@ -16,7 +16,7 @@ export function TabItem(props: IProps) {
   const { data } = props
   const name = getFileNameFromPath(data.path)
   const icon = getFileIcon(name)
-  const { removeModel } = useEditorModel()
+  const { removeModel, setCurrentEditor } = useEditorModel()
   const [currentActiveEditor, setCurrentActiveEditor] = useAtom(currentActiveEditorAtom)
 
   function handleRemove(e: React.MouseEvent<SVGElement, MouseEvent>) {
@@ -35,7 +35,7 @@ export function TabItem(props: IProps) {
   return (
     <MyTooltip message={data.path}>
       <div
-        onClick={() => setCurrentActiveEditor(data.path)}
+        onClick={() => setCurrentEditor(data.path)}
         className={cn([
           'flex',
           'items-center',
@@ -49,7 +49,10 @@ export function TabItem(props: IProps) {
       >
         {icon}
         {name}
-        <VscClose onClick={handleRemove} className="opacity-0 group-hover:opacity-100" />
+        <VscClose
+          onClick={handleRemove}
+          className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-accent"
+        />
       </div>
     </MyTooltip>
   )

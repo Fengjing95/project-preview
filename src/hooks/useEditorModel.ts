@@ -1,8 +1,11 @@
-import { editorModelsAtom, IEditorModel } from '@/store/editor'
-import { useAtom } from 'jotai'
+import { currentActiveEditorAtom, editorModelsAtom, IEditorModel } from '@/store/editor'
+import { useAtom, useSetAtom } from 'jotai'
+import { useRef } from 'react'
 
 export function useEditorModel() {
   const [modelMap, setModelMap] = useAtom(editorModelsAtom)
+  const currentPathRef = useRef('') // 当前操作的文件路径
+  const setCurrentActiveEditor = useSetAtom(currentActiveEditorAtom)
 
   /**
    * 添加编辑器
@@ -40,5 +43,19 @@ export function useEditorModel() {
     return modelMap
   }
 
-  return { addModel, removeModel, updateModel }
+  const setCurrentEditor = (path: string) => {
+    setCurrentActiveEditor(path)
+    if (currentPathRef.current === path) {
+      // 当前路径相同（视为双击操作）
+      updateModel(path, { editorType: 'pin' })
+    } else {
+      // 记录并延时重置路径
+      currentPathRef.current = path
+      setTimeout(() => {
+        currentPathRef.current = ''
+      }, 150)
+    }
+  }
+
+  return { addModel, removeModel, updateModel, setCurrentEditor }
 }

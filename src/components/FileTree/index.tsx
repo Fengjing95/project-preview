@@ -3,10 +3,10 @@ import { WebContainerService } from '../../services/WebContainerService'
 import { bindEvent, EventName, removeEvent } from '@/lib/evenemitter'
 import { BiFolder, BiFolderOpen } from 'react-icons/bi'
 import { getFileIcon, getFileLang } from '@/lib/getFileLang'
-import { useAtomValue, useSetAtom } from 'jotai'
-import { currentActiveEditorAtom, editorModelsAtom } from '@/store/editor'
+import { useAtomValue } from 'jotai'
+import { editorModelsAtom } from '@/store/editor'
 import { editor } from '@/lib/editor'
-import { useClickAndDouble, useEditorModel } from '@/hooks'
+import { useEditorModel } from '@/hooks'
 
 interface FileNode {
   name: string
@@ -19,8 +19,7 @@ export const FileTree = () => {
   const [files, setFiles] = useState<FileNode[]>([])
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
   const modelMap = useAtomValue(editorModelsAtom)
-  const { addModel, updateModel } = useEditorModel()
-  const setCurrentActiveEditor = useSetAtom(currentActiveEditorAtom)
+  const { addModel, setCurrentEditor } = useEditorModel()
 
   function sortNodes(nodes: FileNode[]): FileNode[] {
     const directories = nodes
@@ -150,17 +149,10 @@ export const FileTree = () => {
         // 新增临时编辑器
         addModel(path, { model, isChanged: false, editorType: 'temporary' })
       }
-    } else {
-      // TODO 时间内
-      // 已打开当前文件，如果当前文件是临时编辑器，提升为固定编辑器
-      if (temporaryEditorPath === path) {
-        updateModel(path, { editorType: 'pin' })
-      }
     }
-    setCurrentActiveEditor(path)
+    // 切换编辑器
+    setCurrentEditor(path)
   }
-
-  const { onClick, onDoubleClick } = useClickAndDouble({ time: 150 })
 
   const renderNode = (node: FileNode) => {
     const isExpanded = expandedDirs.has(node.path)
@@ -174,7 +166,7 @@ export const FileTree = () => {
               toggleDirectory(node.path)
             } else {
               // 打开临时编辑器
-              onClick(() => openEditor(node.path, 'temporary'))
+              openEditor(node.path, 'temporary')
             }
           }}
           onDoubleClick={() => {
@@ -182,7 +174,7 @@ export const FileTree = () => {
               return
             }
             // 打开固定编辑器
-            onDoubleClick(() => openEditor(node.path, 'pin'))
+            openEditor(node.path, 'pin')
           }}
         >
           <span className="mr-2">

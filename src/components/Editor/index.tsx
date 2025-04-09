@@ -116,7 +116,7 @@ export const Editor = () => {
 
   return (
     <div style={{ width: '100%', height: '100%' }}>
-      <div className="h-10 border-b flex overflow-x-auto">
+      <div className="h-10 border-b flex overflow-x-auto box-content">
         {tabs.map((tab) => (
           <TabItem key={tab.path} data={tab} />
         ))}
