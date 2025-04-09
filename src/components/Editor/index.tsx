@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import MonacoEditor, { OnMount } from '@monaco-editor/react'
 import { WebContainerService } from '@/services/WebContainerService'
-import { getFileLang, getFileNameFromPath } from '@/lib/getFileLang'
+import { getFileNameFromPath } from '@/lib/getFileLang'
 import { useKeyPress, usePrevious } from 'ahooks'
 import { KEY_MAP } from '@/constants/keyboard'
 import { useTheme } from '@/components/ThemeProvider'
@@ -10,10 +10,8 @@ import {
   IEditorModel,
   editorModelsAtom,
   ICodeEditorViewState,
-  ITextModel,
   currentActiveEditorAtom,
 } from '@/store/editor'
-import { editor } from '@/lib/editor'
 import { TabItem } from './TabItem'
 
 export const Editor = () => {
@@ -32,6 +30,25 @@ export const Editor = () => {
     }))
   }, [modelMap])
 
+  // 保存编辑器状态
+  const saveEditor = () => {
+    if (prevFilePath && editorInstance) {
+      const editorModel = modelMap.get(prevFilePath)
+      if (!editorModel) return
+
+      const state = editorInstance.saveViewState() as ICodeEditorViewState // 保存视图状态
+      modelMap.set(prevFilePath, {
+        ...editorModel,
+        state,
+      }) // 保存模型
+      setModelMap(new Map(modelMap)) // 保存模型映射
+    }
+  }
+
+  useEffect(() => {
+    saveEditor()
+  }, [prevFilePath])
+
   // 加载文件内容
   const loadFileContent = async () => {
     if (!editorInstance) return
@@ -40,47 +57,15 @@ export const Editor = () => {
       // 如果已经存在模型，则直接使用
       const { model, state } = modelMap.get(filePath) as IEditorModel
       editorInstance.setModel(model) // 设置模型
-      editorInstance.restoreViewState(state) // 恢复视图状态
-    } else {
-      // 从 container 读取文件内容
-      const container = WebContainerService.getInstance()
-      const webcontainer = container.getWebContainer()
-
-      if (!webcontainer) return
-      try {
-        const language = getFileLang(filePath) // 语言
-        const file = await webcontainer.fs.readFile(filePath, 'utf-8')
-        const content = file.toString() // 文件内容
-
-        const model = editor.createModel(content, language) // 创建模型
-        editorInstance.setModel(model)
-
-        const state = editorInstance.saveViewState() as ICodeEditorViewState // 保存视图状态
-        modelMap.set(filePath, { model, state, isChanged: false }) // 保存模型
-        setModelMap(new Map(modelMap)) // 保存模型映射
-      } catch (error) {
-        console.error('Failed to read file:', error)
-      }
+      if (state) editorInstance.restoreViewState(state) // 恢复视图状态
     }
     editorInstance.focus() // 聚焦
   }
 
-  // 保存编辑器状态
-  const saveEditor = () => {
-    if (prevFilePath && editorInstance) {
-      const state = editorInstance.saveViewState() as ICodeEditorViewState // 保存视图状态
-      const model = editorInstance.getModel() as ITextModel // 获取模型
-      const isChanged = modelMap.get(prevFilePath)?.isChanged || false // 是否编辑
-      modelMap.set(prevFilePath, { model, state, isChanged }) // 保存模型
-      setModelMap(new Map(modelMap)) // 保存模型映射
-    }
-  }
-
-  // 切换文件时保存编辑器状态, 加载新文件内容
+  // 切换文件时加载文件内容
   useEffect(() => {
-    saveEditor()
     loadFileContent()
-  }, [filePath, editorInstance])
+  }, [filePath, editorInstance, modelMap])
 
   // 全局主题变化时更新编辑器主题
   useEffect(() => {

@@ -7,9 +7,10 @@ export type ICodeEditorViewState = NonNullable<
 export type ITextModel = ReturnType<typeof editor.createModel>
 
 export type IEditorModel = {
-  state: ICodeEditorViewState // 编辑器状态
+  state?: ICodeEditorViewState // 编辑器状态
   model: ITextModel // 编辑器模型
   isChanged: boolean // 是否被修改
+  editorType: 'pin' | 'temporary' // 类型(固定｜临时)
 }
 
 // Manaco Editor 模型数据
