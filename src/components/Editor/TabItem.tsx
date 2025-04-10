@@ -30,7 +30,6 @@ export function TabItem(props: IProps) {
     e.stopPropagation()
   }
 
-  // TODO: 双击pin
   // TODO: 拖动
   return (
     <MyTooltip message={data.path}>
@@ -44,14 +43,15 @@ export function TabItem(props: IProps) {
           { italic: data.editorType === 'temporary' },
           'group',
           'cursor-pointer',
-          // { 'bg-background-200': currentActiveEditor === data.path },
+          { 'bg-accent': currentActiveEditor === data.path },
+          'select-none',
         ])}
       >
         {icon}
         {name}
         <VscClose
           onClick={handleRemove}
-          className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-accent"
+          className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-popover"
         />
       </div>
     </MyTooltip>
