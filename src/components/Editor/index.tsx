@@ -5,7 +5,7 @@ import { getFileNameFromPath } from '@/lib/getFileLang'
 import { useKeyPress, usePrevious } from 'ahooks'
 import { KEY_MAP } from '@/constants/keyboard'
 import { useTheme } from '@/components/ThemeProvider'
-import { useAtom, useAtomValue } from 'jotai'
+import { useAtomValue } from 'jotai'
 import {
   IEditorModel,
   editorModelsAtom,
@@ -13,18 +13,21 @@ import {
   currentActiveEditorAtom,
 } from '@/store/editor'
 import { TabItem } from './TabItem'
+import { useEditorModel } from '@/hooks'
 
 export const Editor = () => {
   const [editorInstance, setEditorInstance] = useState<Parameters<OnMount>[0] | null>(null)
   const { theme } = useTheme()
-  const [modelMap, setModelMap] = useAtom(editorModelsAtom) // 编辑器模型
+  const modelMap = useAtomValue(editorModelsAtom) // 编辑器模型
   const filePath = useAtomValue(currentActiveEditorAtom)
   const prevFilePath = usePrevious(filePath) // 生效中的文件路径
+  const { updateModel } = useEditorModel()
   // 标签页
   const tabs = useMemo(() => {
     const entries = Array.from(modelMap.entries())
     return entries.map(([path, editorModel]) => ({
       path,
+      id: path,
       name: getFileNameFromPath(path),
       ...editorModel,
     }))
@@ -37,11 +40,7 @@ export const Editor = () => {
       if (!editorModel) return
 
       const state = editorInstance.saveViewState() as ICodeEditorViewState // 保存视图状态
-      modelMap.set(prevFilePath, {
-        ...editorModel,
-        state,
-      }) // 保存模型
-      setModelMap(new Map(modelMap)) // 保存模型映射
+      updateModel(prevFilePath, { state })
     }
   }
 
@@ -74,23 +73,6 @@ export const Editor = () => {
     })
   }, [theme])
 
-  /**
-   * 变更编辑器状态
-   * @param isChanged 是否编辑
-   */
-  const handleChangeEditorStatus = (isChanged: boolean) => {
-    if (!editorInstance) return
-
-    const editorModel = modelMap.get(filePath)
-    if (!editorModel || editorModel.isChanged) return
-
-    modelMap.set(filePath, {
-      ...editorModel,
-      isChanged,
-    })
-    setModelMap(new Map(modelMap))
-  }
-
   // 保存编辑器内容
   const handleEditorSave = () => {
     const value = editorInstance?.getValue() || ''
@@ -103,7 +85,7 @@ export const Editor = () => {
 
       try {
         await webcontainer.fs.writeFile(filePath, value)
-        handleChangeEditorStatus(false)
+        updateModel(filePath, { isChanged: false })
       } catch (error) {
         console.error('Failed to save file:', error)
       }
@@ -125,7 +107,10 @@ export const Editor = () => {
         theme={theme}
         height="100%"
         onMount={setEditorInstance}
-        onChange={() => handleChangeEditorStatus(true)}
+        onChange={() => {
+          updateModel(filePath, { editorType: 'pin' })
+          updateModel(filePath, { isChanged: true })
+        }}
         options={{
           minimap: { enabled: true },
           fontSize: 14,

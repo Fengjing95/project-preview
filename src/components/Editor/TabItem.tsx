@@ -41,7 +41,7 @@ export function TabItem(props: IProps) {
           'px-2',
           'gap-1',
           { italic: data.editorType === 'temporary' },
-          'group',
+          'group/container',
           'cursor-pointer',
           { 'bg-accent': currentActiveEditor === data.path },
           'select-none',
@@ -49,10 +49,22 @@ export function TabItem(props: IProps) {
       >
         {icon}
         {name}
-        <VscClose
-          onClick={handleRemove}
-          className="p-0.5 rounded opacity-0 group-hover:opacity-100 hover:bg-popover"
-        />
+        <div className="relative w-3 h-3 group/close">
+          <VscClose
+            onClick={handleRemove}
+            className={cn([
+              'absolute',
+              'p-0.5',
+              'rounded',
+              currentActiveEditor === data.path ? 'opacity-100' : 'opacity-0',
+              'group-hover/container:opacity-100',
+              'hover:bg-popover',
+            ])}
+          />
+          {data.isChanged && (
+            <div className="absolute top-1 left-1 w-2 h-2 rounded-full bg-primary group-hover/close:hidden" />
+          )}
+        </div>
       </div>
     </MyTooltip>
   )
