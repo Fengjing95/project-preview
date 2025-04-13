@@ -126,7 +126,7 @@ export class GitLabAdapter implements RepositoryAdapter {
     return fileSystem
   }
 
-  async fetchRepository(owner: string, repo: string, branch = 'main') {
+  async fetchRepository(_: string, repo: string, branch = 'main') {
     const files = await this.fetchDirectory(repo, '', branch)
     const fileSystem = this.convertToWebContainerFormat(files)
     return { files, fileSystem }
@@ -137,7 +137,7 @@ export class GitLabAdapter implements RepositoryAdapter {
    * @param owner 作者
    * @returns
    */
-  async getOwnerInfo(owner: string): Promise<{
+  async getOwnerInfo(owner: string | number): Promise<{
     avatar: string
     htmlUrl: string
     name: string
@@ -145,7 +145,7 @@ export class GitLabAdapter implements RepositoryAdapter {
     company?: string
     location?: string
   }> {
-    const response = await this.gitlab.Users.show(owner)
+    const response = await this.gitlab.Users.show(owner as number)
 
     return {
       avatar: response.avatar_url as string,
@@ -164,7 +164,7 @@ export class GitLabAdapter implements RepositoryAdapter {
    * @returns
    */
   async getRepositoryStats(
-    owner: string,
+    _: string,
     repo: string,
   ): Promise<{
     stars: number

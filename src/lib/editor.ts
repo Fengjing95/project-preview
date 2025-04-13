@@ -1,8 +1,9 @@
 import { loader } from '@monaco-editor/react'
 
-export const monaco = await loader.init()
+type MatchPromiseType<T> = T extends Promise<infer R> ? R : T
+export let editor: MatchPromiseType<ReturnType<typeof loader.init>>['editor']
 
-export const editor = monaco.editor
+loader.init().then((m) => (editor = m.editor))
 
 /**
  * 初始化monaco
