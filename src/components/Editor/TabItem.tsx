@@ -1,5 +1,5 @@
 import { currentActiveEditorAtom, IEditorModel } from '@/store/editor'
-import { MyTooltip } from '../MyTooltip'
+import { MyTooltip, MyDialog } from '../'
 import { getFileIcon, getFileNameFromPath } from '@/lib/getFileLang'
 import { cn } from '@/lib/utils'
 import { VscClose } from 'react-icons/vsc'
@@ -20,17 +20,24 @@ export function TabItem(props: IProps) {
   const [currentActiveEditor, setCurrentActiveEditor] = useAtom(currentActiveEditorAtom)
 
   function handleRemove(e: React.MouseEvent<SVGElement, MouseEvent>) {
-    const modelMap = removeModel(data.path)
-    if (data.path === currentActiveEditor) {
-      // 当前激活的编辑器被关闭，切换到上一个编辑器
-      const keys = Array.from(modelMap.keys())
-      const prevPath = keys[keys.length - 1]
-      setCurrentActiveEditor(prevPath)
+    if (data.isChanged) {
+      MyDialog.alert({
+        title: '提示',
+        content: '文件未保存，直接关闭？',
+        onConfirm: () => {
+          const modelMap = removeModel(data.path)
+          if (data.path === currentActiveEditor) {
+            // 当前激活的编辑器被关闭，切换到上一个编辑器
+            const keys = Array.from(modelMap.keys())
+            const prevPath = keys[keys.length - 1]
+            setCurrentActiveEditor(prevPath)
+          }
+        },
+      })
     }
     e.stopPropagation()
   }
 
-  // TODO: 拖动
   return (
     <MyTooltip message={data.path}>
       <div
@@ -43,7 +50,7 @@ export function TabItem(props: IProps) {
           { italic: data.editorType === 'temporary' },
           'group/container',
           'cursor-pointer',
-          { 'bg-accent': currentActiveEditor === data.path },
+          currentActiveEditor === data.path ? 'bg-accent' : 'bg-background',
           'select-none',
         ])}
       >
