@@ -113,4 +113,15 @@ export class WebContainerService {
 
     return terminal
   }
+
+  /**
+   * 根据文件路径在文件系统中读取文件内容（UTF-8）
+   * @param path 文件路径
+   * @returns
+   */
+  async readFile(path: string) {
+    if (!path || !this.webContainerInstance) return ''
+
+    return await this.webContainerInstance.fs.readFile(path, 'utf-8')
+  }
 }

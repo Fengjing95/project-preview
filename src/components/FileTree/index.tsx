@@ -2,11 +2,11 @@ import { useEffect, useState } from 'react'
 import { WebContainerService } from '../../services/WebContainerService'
 import { bindEvent, EventName, removeEvent } from '@/lib/evenemitter'
 import { BiFolder, BiFolderOpen } from 'react-icons/bi'
-import { getFileIcon } from '@/lib/getFileLang'
-
-interface FileTreeProps {
-  onSelect?: (filePath: string) => void
-}
+import { getFileIcon, getFileLang } from '@/lib/getFileLang'
+import { useAtomValue } from 'jotai'
+import { editorModelsAtom } from '@/store/editor'
+import { editor } from '@/lib/editor'
+import { useEditorModel } from '@/hooks'
 
 interface FileNode {
   name: string
@@ -15,9 +15,11 @@ interface FileNode {
   path: string
 }
 
-export const FileTree: React.FC<FileTreeProps> = ({ onSelect }) => {
+export const FileTree = () => {
   const [files, setFiles] = useState<FileNode[]>([])
   const [expandedDirs, setExpandedDirs] = useState<Set<string>>(new Set())
+  const modelMap = useAtomValue(editorModelsAtom)
+  const { addModel, setCurrentEditor } = useEditorModel()
 
   function sortNodes(nodes: FileNode[]): FileNode[] {
     const directories = nodes
@@ -38,16 +40,16 @@ export const FileTree: React.FC<FileTreeProps> = ({ onSelect }) => {
   }
 
   function getContainer() {
-    const container = WebContainerService.getInstance()
-    const webcontainer = container.getWebContainer()
-    return webcontainer
+    const webContainerService = WebContainerService.getInstance()
+    const webContainer = webContainerService.getWebContainer()
+    return webContainer
   }
 
   async function loadRoot() {
-    const webcontainer = getContainer()
-    if (!webcontainer) return
+    const webContainer = getContainer()
+    if (!webContainer) return
 
-    const root = await webcontainer.fs.readdir('/', { withFileTypes: true })
+    const root = await webContainer.fs.readdir('/', { withFileTypes: true })
     const fileTree = await Promise.all(
       root.map(async (entry) => {
         const node: FileNode = {
@@ -68,11 +70,11 @@ export const FileTree: React.FC<FileTreeProps> = ({ onSelect }) => {
   }
 
   const loadDirectory = async (path: string): Promise<FileNode[]> => {
-    const webcontainer = getContainer()
-    if (!webcontainer) return []
+    const webContainer = getContainer()
+    if (!webContainer) return []
 
     try {
-      const entries = await webcontainer.fs.readdir(path, { withFileTypes: true })
+      const entries = await webContainer.fs.readdir(path, { withFileTypes: true })
       const nodes = await Promise.all(
         entries.map(async (entry) => {
           const entryPath = `${path}/${entry.name}`
@@ -122,6 +124,36 @@ export const FileTree: React.FC<FileTreeProps> = ({ onSelect }) => {
     })
   }
 
+  /**
+   * 打开编辑器
+   * @param path 文件路径
+   * @param type 编辑器类型 pin-固定编辑器 temporary-临时编辑器
+   */
+  const openEditor = async (path: string, type?: 'pin' | 'temporary') => {
+    const temporaryEditorPath = Array.from(modelMap.entries()).find(
+      (model) => model[1].editorType === 'temporary',
+    )?.[0]
+    if (!modelMap.has(path)) {
+      // 移除原有临时编辑器
+      if (temporaryEditorPath) {
+        modelMap.delete(temporaryEditorPath)
+      }
+      // 未打开当前文件，创建编辑器模型
+      const content = await WebContainerService.getInstance().readFile(path) // 读取文件内容
+      const language = getFileLang(path) // 语言
+      const model = editor.createModel(content, language) // 创建模型
+      if (type === 'pin') {
+        // 新增固定编辑器
+        addModel(path, { model, isChanged: false, editorType: 'pin' })
+      } else {
+        // 新增临时编辑器
+        addModel(path, { model, isChanged: false, editorType: 'temporary' })
+      }
+    }
+    // 切换编辑器
+    setCurrentEditor(path)
+  }
+
   const renderNode = (node: FileNode) => {
     const isExpanded = expandedDirs.has(node.path)
 
@@ -133,8 +165,16 @@ export const FileTree: React.FC<FileTreeProps> = ({ onSelect }) => {
             if (node.type === 'directory') {
               toggleDirectory(node.path)
             } else {
-              onSelect?.(node.path)
+              // 打开临时编辑器
+              openEditor(node.path, 'temporary')
             }
+          }}
+          onDoubleClick={() => {
+            if (node.type === 'directory') {
+              return
+            }
+            // 打开固定编辑器
+            openEditor(node.path, 'pin')
           }}
         >
           <span className="mr-2">

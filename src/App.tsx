@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useRef, useEffect } from 'react'
 import { WebContainerService } from '@/services/WebContainerService'
 import {
   Terminal,
@@ -22,13 +22,16 @@ import { resolveLeftPanelAtom, serviceStatusAtom } from '@/store/global'
 import { useResize, useContainer } from '@/hooks'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import { BiPlus } from 'react-icons/bi'
-import { initMonaco, isUseInIframe } from '@/lib/dom'
+import { isUseInIframe } from '@/lib/dom'
 import { Button } from '@/components/ui/button'
 import { baseInfoAtom } from '@/store/repo'
+import { initMonaco } from '@/lib/editor'
+import { editorModelsAtom } from '@/store/editor'
 
 function App() {
   const [status, setStatus] = useAtom(serviceStatusAtom)
-  const [currentFile, setCurrentFile] = useState('')
+  const modelMap = useAtomValue(editorModelsAtom) // 编辑器模型
+  const hasOpenEditor = modelMap.size > 0 // 是否有打开的编辑器
   const previewRef = useRef<IPreviewRef>(null)
   const resolveLeftPanel = useAtomValue(resolveLeftPanelAtom) // 左侧面板的宽度
   const {
@@ -99,7 +102,7 @@ function App() {
                   {
                     id: 'file-tree',
                     title: '文件',
-                    content: <FileTree onSelect={setCurrentFile} />,
+                    content: <FileTree />,
                     defaultOpen: true,
                     containerClassName: 'flex-1 min-h-0',
                     className: 'flex-1 min-h-0 overflow-auto -mr-2',
@@ -117,7 +120,7 @@ function App() {
                     {/* editor */}
                     <ResizablePanel defaultSize={50} minSize={20}>
                       <div className="flex h-full items-center justify-center">
-                        {!currentFile ? <Welcome /> : <Editor filePath={currentFile} />}
+                        {!hasOpenEditor ? <Welcome /> : <Editor />}
                       </div>
                     </ResizablePanel>
                     <ResizableHandle />
