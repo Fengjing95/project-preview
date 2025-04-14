@@ -22,18 +22,18 @@ interface RepoFormProps {
 
 const RepoTypeOptions = [
   {
-    icon: '/images/github-gary.svg',
-    selectIcon: '/images/github.svg',
+    icon: import.meta.env.BASE_URL + '/images/github-gary.svg',
+    selectIcon: import.meta.env.BASE_URL + '/images/github.svg',
     value: RepositoryAdapterEnum.GITHUB,
   },
   {
-    icon: '/images/gitlab-gary.svg',
-    selectIcon: '/images/gitlab.svg',
+    icon: import.meta.env.BASE_URL + '/images/gitlab-gary.svg',
+    selectIcon: import.meta.env.BASE_URL + '/images/gitlab.svg',
     value: RepositoryAdapterEnum.GITLAB,
   },
   {
-    icon: '/images/gitee-gary.svg',
-    selectIcon: '/images/gitee.svg',
+    icon: import.meta.env.BASE_URL + '/images/gitee-gary.svg',
+    selectIcon: import.meta.env.BASE_URL + '/images/gitee.svg',
     value: RepositoryAdapterEnum.GITEE,
   },
 ]

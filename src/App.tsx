@@ -25,8 +25,8 @@ import { BiPlus } from 'react-icons/bi'
 import { isUseInIframe } from '@/lib/dom'
 import { Button } from '@/components/ui/button'
 import { baseInfoAtom } from '@/store/repo'
-import { initMonaco } from '@/lib/editor'
 import { editorModelsAtom } from '@/store/editor'
+import '@/lib/editor'
 
 function App() {
   const [status, setStatus] = useAtom(serviceStatusAtom)
@@ -52,8 +52,6 @@ function App() {
   const formOpen = !owner || !repo || !token || !gitType
 
   useEffect(() => {
-    // 初始化编辑器
-    initMonaco()
     // iframe中不自动执行
     if (!isUseInIframe() && !formOpen) {
       // 初始化核心服务
